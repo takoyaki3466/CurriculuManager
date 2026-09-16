@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.takoyaki.curriculummanager.controller.EnrollmentController">
+
+    <top>
+        <VBox spacing="10">
+
+            <padding>
+                <Insets
+                        top="15"
+                        right="15"
+                        bottom="15"
+                        left="15"/>
+            </padding>
+
+            <HBox
+                    spacing="10"
+                    alignment="CENTER_LEFT">
+
+                <Label
+                        text="履修科目"
+                        style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+
+                <Button
+                        text="更新"
+                        onAction="#refresh"/>
+
+            </HBox>
+
+            <!--
+                履修登録に使用する選択欄。
+
+                学部を選択すると、その学部のカリキュラムが
+                カリキュラムComboBoxに読み込まれる。
+
+                カリキュラムを選択すると、そのカリキュラムに
+                登録されている科目が科目ComboBoxに読み込まれる。
+            -->
+            <HBox
+                    spacing="10"
+                    alignment="CENTER_LEFT">
+
+                <Label
+                        text="学部"/>
+
+                <ComboBox
+                        fx:id="departmentComboBox"
+                        prefWidth="180"/>
+
+                <Label
+                        text="カリキュラム"/>
+
+                <ComboBox
+                        fx:id="curriculumComboBox"
+                        prefWidth="220"/>
+
+            </HBox>
+
+            <HBox
+                    spacing="10"
+                    alignment="CENTER_LEFT">
+
+                <Label
+                        text="科目"/>
+
+                <ComboBox
+                        fx:id="courseComboBox"
+                        prefWidth="250"/>
+
+                <Label
+                        text="年度"/>
+
+                <ComboBox
+                        fx:id="yearComboBox"
+                        prefWidth="100"/>
+
+                <Label
+                        text="学期"/>
+
+                <ComboBox
+                        fx:id="semesterComboBox"
+                        prefWidth="100"/>
+
+                <Button
+                        text="履修登録"
+                        onAction="#addEnrollment"/>
+
+                <Button
+                        text="削除"
+                        onAction="#deleteEnrollment"/>
+
+            </HBox>
+
+        </VBox>
+    </top>
+
+    <center>
+        <TableView
+                fx:id="enrollmentTable"
+                prefHeight="500">
+
+            <columns>
+
+                <TableColumn
+                        fx:id="yearColumn"
+                        text="年度"
+                        prefWidth="80"/>
+
+                <TableColumn
+                        fx:id="semesterColumn"
+                        text="学期"
+                        prefWidth="90"/>
+
+                <TableColumn
+                        fx:id="courseCodeColumn"
+                        text="科目コード"
+                        prefWidth="120"/>
+
+                <TableColumn
+                        fx:id="courseNameColumn"
+                        text="科目名"
+                        prefWidth="250"/>
+
+                <TableColumn
+                        fx:id="creditsColumn"
+                        text="単位"
+                        prefWidth="80"/>
+
+                <TableColumn
+                        fx:id="gradeColumn"
+                        text="成績"
+                        prefWidth="80"/>
+
+            </columns>
+
+        </TableView>
+    </center>
+
+</BorderPane>

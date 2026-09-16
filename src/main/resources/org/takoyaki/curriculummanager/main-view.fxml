@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.takoyaki.curriculummanager.controller.MainController">
+
+    <top>
+        <VBox spacing="5">
+
+            <padding>
+                <Insets
+                        top="20"
+                        right="20"
+                        bottom="20"
+                        left="20"/>
+            </padding>
+
+            <Label
+                    text="履修管理くん"
+                    style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+            <Label
+                    text="履修・成績・卒業要件管理"/>
+
+        </VBox>
+    </top>
+
+    <center>
+        <HBox>
+
+            <!-- 左側メニュー -->
+            <VBox
+                    spacing="10"
+                    prefWidth="160">
+
+                <padding>
+                    <Insets
+                            top="20"
+                            right="15"
+                            bottom="20"
+                            left="15"/>
+                </padding>
+
+                <Label
+                        text="メニュー"
+                        style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                <Button
+                        text="ダッシュボード"
+                        onAction="#openDashboard"
+                        maxWidth="Infinity"/>
+
+                <Button
+                        text="履修科目"
+                        onAction="#openEnrollment"
+                        maxWidth="Infinity"/>
+
+                <Button
+                        text="成績"
+                        onAction="#openGrade"
+                        maxWidth="Infinity"/>
+
+                <Button
+                        text="カリキュラム"
+                        onAction="#openCurriculum"
+                        maxWidth="Infinity"/>
+
+                <!--
+                    カリキュラムに登録する科目と、
+                    その科目の必修・選択を設定する画面。
+                -->
+                <Button
+                        text="カリキュラム科目設定"
+                        onAction="#openCurriculumCourse"
+                        maxWidth="Infinity"/>
+
+                <Button
+                        text="卒業要件"
+                        onAction="#openGraduation"
+                        maxWidth="Infinity"/>
+
+            </VBox>
+
+            <!-- 各画面を表示する領域 -->
+            <StackPane
+                    fx:id="contentPane"
+                    HBox.hgrow="ALWAYS"/>
+
+        </HBox>
+    </center>
+
+</BorderPane>

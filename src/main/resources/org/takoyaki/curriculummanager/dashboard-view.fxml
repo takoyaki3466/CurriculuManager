@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.takoyaki.curriculummanager.controller.DashboardController"
+        spacing="25">
+
+    <padding>
+        <Insets
+                top="20"
+                right="20"
+                bottom="20"
+                left="20"/>
+    </padding>
+
+    <!-- タイトル -->
+    <Label
+            text="ダッシュボード"
+            style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+
+    <!-- ダッシュボード本体 -->
+    <HBox
+            spacing="40"
+            VBox.vgrow="ALWAYS">
+
+        <!-- 左側：現在の情報 -->
+        <VBox
+                spacing="25"
+                prefWidth="300">
+
+            <VBox spacing="5">
+
+                <Label
+                        text="GPA"
+                        style="-fx-font-size: 14px;"/>
+
+                <Label
+                        fx:id="gpaLabel"
+                        text="0.00"
+                        style="-fx-font-size: 28px; -fx-font-weight: bold;"/>
+
+            </VBox>
+
+            <VBox spacing="5">
+
+                <Label
+                        text="修得単位"
+                        style="-fx-font-size: 14px;"/>
+
+                <Label
+                        fx:id="earnedCreditsLabel"
+                        text="0.0 単位"
+                        style="-fx-font-size: 28px; -fx-font-weight: bold;"/>
+
+            </VBox>
+
+            <Button
+                    text="情報を更新"
+                    onAction="#refresh"
+                    prefWidth="150"/>
+
+        </VBox>
+
+        <!-- 右側：カリキュラム一覧 -->
+        <VBox
+                spacing="10"
+                HBox.hgrow="ALWAYS">
+
+            <Label
+                    text="カリキュラム・卒業要件一覧"
+                    style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+            <ListView
+                    fx:id="curriculumRequirementListView"
+                    VBox.vgrow="ALWAYS"
+                    HBox.hgrow="ALWAYS">
+
+                <!-- 一覧が空の場合に表示するNode -->
+                <placeholder>
+                    <Label
+                            text="登録されているカリキュラムがありません。"/>
+                </placeholder>
+
+            </ListView>
+
+        </VBox>
+
+    </HBox>
+
+</VBox>

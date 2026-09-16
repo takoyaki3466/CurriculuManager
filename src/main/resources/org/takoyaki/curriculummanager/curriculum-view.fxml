@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.takoyaki.curriculummanager.controller.CurriculumController">
+
+    <top>
+        <VBox spacing="12">
+
+            <padding>
+                <Insets
+                        top="15"
+                        right="15"
+                        bottom="15"
+                        left="15"/>
+            </padding>
+
+            <!--
+                画面タイトルと更新ボタン
+            -->
+            <HBox
+                    spacing="15"
+                    alignment="CENTER_LEFT">
+
+                <Label
+                        text="カリキュラム"
+                        style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+
+                <Button
+                        text="更新"
+                        onAction="#refresh"/>
+
+            </HBox>
+
+            <!--
+                学部・学科・カリキュラム選択
+            -->
+            <HBox
+                    spacing="10"
+                    alignment="CENTER_LEFT">
+
+                <!-- 学部 -->
+                <Label
+                        text="学部"/>
+
+                <ComboBox
+                        fx:id="departmentComboBox"
+                        prefWidth="180"/>
+
+                <Button
+                        text="学部追加"
+                        onAction="#addDepartment"/>
+
+                <Button
+                        text="学部編集"
+                        onAction="#editDepartment"/>
+
+                <Button
+                        text="学部削除"
+                        onAction="#deleteDepartment"/>
+
+
+                <!-- 学科 -->
+                <Label
+                        text="学科"/>
+
+                <ComboBox
+                        fx:id="majorComboBox"
+                        prefWidth="200"/>
+
+                <Button
+                        text="学科追加"
+                        onAction="#addMajor"/>
+
+                <Button
+                        text="学科編集"
+                        onAction="#editMajor"/>
+
+                <Button
+                        text="学科削除"
+                        onAction="#deleteMajor"/>
+
+
+                <!-- カリキュラム -->
+                <Label
+                        text="カリキュラム"/>
+
+                <ComboBox
+                        fx:id="curriculumComboBox"
+                        prefWidth="250"/>
+
+                <Button
+                        text="カリキュラム追加"
+                        onAction="#addCurriculum"/>
+
+                <Button
+                        text="カリキュラム編集"
+                        onAction="#editCurriculum"/>
+
+                <Button
+                        text="カリキュラム削除"
+                        onAction="#deleteCurriculum"/>
+
+            </HBox>
+
+        </VBox>
+    </top>
+
+
+    <center>
+        <VBox spacing="10">
+
+            <padding>
+                <Insets
+                        top="0"
+                        right="15"
+                        bottom="15"
+                        left="15"/>
+            </padding>
+
+
+            <!--
+                科目カテゴリ
+            -->
+            <HBox
+                    spacing="10"
+                    alignment="CENTER_LEFT">
+
+                <Label
+                        text="科目カテゴリ"
+                        style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                <Button
+                        text="カテゴリ追加"
+                        onAction="#addCategory"/>
+
+                <Button
+                        text="カテゴリ削除"
+                        onAction="#deleteCategory"/>
+
+            </HBox>
+
+            <ListView
+                    fx:id="categoryList"
+                    prefHeight="150"/>
+
+
+            <!--
+                科目
+            -->
+            <HBox
+                    spacing="10"
+                    alignment="CENTER_LEFT">
+
+                <Label
+                        text="科目"
+                        style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                <Button
+                        text="科目追加"
+                        onAction="#addCourse"/>
+
+                <Button
+                        text="科目削除"
+                        onAction="#deleteCourse"/>
+
+            </HBox>
+
+
+            <TableView
+                    fx:id="courseTable"
+                    prefHeight="300">
+
+                <columns>
+
+                    <TableColumn
+                            fx:id="courseCodeColumn"
+                            text="科目コード"
+                            prefWidth="120"/>
+
+                    <TableColumn
+                            fx:id="courseNameColumn"
+                            text="科目名"
+                            prefWidth="250"/>
+
+                    <TableColumn
+                            fx:id="creditsColumn"
+                            text="単位"
+                            prefWidth="80"/>
+
+                </columns>
+
+            </TableView>
+
+
+            <!--
+                科目説明
+            -->
+            <Label
+                    text="科目説明"
+                    style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+            <TextArea
+                    fx:id="descriptionArea"
+                    editable="false"
+                    wrapText="true"
+                    prefRowCount="5"/>
+
+        </VBox>
+    </center>
+
+</BorderPane>
