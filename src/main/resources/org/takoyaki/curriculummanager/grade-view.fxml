@@ -7,104 +7,58 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane
         xmlns="http://javafx.com/javafx"
         xmlns:fx="http://javafx.com/fxml"
-        fx:controller="org.takoyaki.curriculummanager.controller.GradeController">
+        fx:controller="org.takoyaki.curriculummanager.controller.GradeController"
+        stylesheets="@style.css"
+        styleClass="page">
 
     <top>
         <VBox spacing="10">
-
             <padding>
-                <Insets
-                        top="15"
-                        right="15"
-                        bottom="15"
-                        left="15"/>
+                <Insets top="14" right="14" bottom="10" left="14"/>
             </padding>
 
-            <HBox
-                    spacing="15"
-                    alignment="CENTER_LEFT">
+            <FlowPane styleClass="responsive-flow" prefWrapLength="760">
+                <Label text="成績" styleClass="title-label"/>
+                <Button text="更新" onAction="#refresh" styleClass="secondary-button"/>
+            </FlowPane>
 
-                <Label
-                        text="成績"
-                        style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+            <VBox spacing="9" styleClass="toolbar-card">
+                <Label fx:id="academicContextLabel" text="学部・学科未設定" styleClass="context-label"/>
 
-                <Button
-                        text="更新"
-                        onAction="#refresh"/>
-
-            </HBox>
-
-            <!-- 学部とカリキュラムの選択 -->
-            <HBox
-                    spacing="10"
-                    alignment="CENTER_LEFT">
-
-                <Label
-                        text="学部"/>
-
-                <ComboBox
-                        fx:id="departmentComboBox"
-                        prefWidth="180"/>
-
-                <Label
-                        text="カリキュラム"/>
-
-                <ComboBox
-                        fx:id="curriculumComboBox"
-                        prefWidth="250"/>
-
-            </HBox>
-
+                <FlowPane styleClass="responsive-flow" prefWrapLength="760">
+                    <HBox styleClass="field-group">
+                        <Label text="カリキュラム"/>
+                        <ComboBox fx:id="curriculumComboBox" styleClass="wide-combo" promptText="カリキュラムを選択"/>
+                    </HBox>
+                </FlowPane>
+            </VBox>
         </VBox>
     </top>
 
     <center>
-        <TableView
-                fx:id="gradeTable"
-                editable="true"
-                prefHeight="500">
+        <VBox styleClass="card">
+            <BorderPane.margin>
+                <Insets top="2" right="14" bottom="14" left="14"/>
+            </BorderPane.margin>
 
-            <columns>
-
-                <TableColumn
-                        fx:id="yearColumn"
-                        text="年度"
-                        prefWidth="70"/>
-
-                <TableColumn
-                        fx:id="semesterColumn"
-                        text="学期"
-                        prefWidth="90"/>
-
-                <TableColumn
-                        fx:id="courseCodeColumn"
-                        text="科目コード"
-                        prefWidth="110"/>
-
-                <TableColumn
-                        fx:id="courseNameColumn"
-                        text="科目名"
-                        prefWidth="250"/>
-
-                <TableColumn
-                        fx:id="creditsColumn"
-                        text="単位"
-                        prefWidth="70"/>
-
-                <TableColumn
-                        fx:id="gradeColumn"
-                        text="成績"
-                        prefWidth="100"/>
-
-            </columns>
-
-        </TableView>
+            <TableView fx:id="gradeTable" editable="true" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="yearColumn" text="年度" minWidth="70" prefWidth="80"/>
+                    <TableColumn fx:id="semesterColumn" text="学期" minWidth="80" prefWidth="90"/>
+                    <TableColumn fx:id="courseCodeColumn" text="科目コード" minWidth="105" prefWidth="120"/>
+                    <TableColumn fx:id="courseNameColumn" text="科目名" minWidth="220" prefWidth="300"/>
+                    <TableColumn fx:id="creditsColumn" text="単位" minWidth="70" prefWidth="80"/>
+                    <TableColumn fx:id="gradeColumn" text="成績" minWidth="90" prefWidth="110"/>
+                </columns>
+            </TableView>
+        </VBox>
     </center>
 
 </BorderPane>

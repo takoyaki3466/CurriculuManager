@@ -5,14 +5,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DepartmentsTable {
-
-    /**
-     * 学科テーブル
-     */
     public static void createDepartmentsTable(Connection connection) throws SQLException {
-
         try (Statement statement = connection.createStatement()) {
-
             statement.execute("""
                     CREATE TABLE IF NOT EXISTS departments (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,

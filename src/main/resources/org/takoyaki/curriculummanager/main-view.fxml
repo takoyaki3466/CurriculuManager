@@ -11,81 +11,37 @@
 <BorderPane
         xmlns="http://javafx.com/javafx"
         xmlns:fx="http://javafx.com/fxml"
+        stylesheets="@style.css"
+        styleClass="page"
         fx:controller="org.takoyaki.curriculummanager.controller.MainController">
 
     <top>
-        <VBox spacing="5">
-
+        <VBox spacing="3" styleClass="app-header">
             <padding>
-                <Insets
-                        top="20"
-                        right="20"
-                        bottom="20"
-                        left="20"/>
+                <Insets top="12" right="14" bottom="12" left="14"/>
             </padding>
-
-            <Label
-                    text="履修管理くん"
-                    style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-
-            <Label
-                    text="履修・成績・卒業要件管理"/>
-
+            <Label text="履修管理くん" styleClass="app-title"/>
+            <Label text="履修・成績・卒業要件管理" styleClass="secondary-label"/>
         </VBox>
     </top>
 
     <center>
         <HBox>
-
-            <!-- 左側メニュー -->
-            <VBox
-                    spacing="10"
-                    prefWidth="160">
-
+            <!-- 小画面向けにサイドバーを少し細くする -->
+            <VBox spacing="6" prefWidth="150" minWidth="135" maxWidth="165" styleClass="sidebar">
                 <padding>
-                    <Insets
-                            top="20"
-                            right="15"
-                            bottom="20"
-                            left="15"/>
+                    <Insets top="12" right="8" bottom="12" left="8"/>
                 </padding>
 
-                <Label
-                        text="メニュー"
-                        style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-
-                <Button
-                        text="ダッシュボード"
-                        onAction="#openDashboard"
-                        maxWidth="Infinity"/>
-
-                <Button
-                        text="履修科目"
-                        onAction="#openEnrollment"
-                        maxWidth="Infinity"/>
-
-                <Button
-                        text="成績"
-                        onAction="#openGrade"
-                        maxWidth="Infinity"/>
-
-                <Button
-                        text="カリキュラム"
-                        onAction="#openCurriculum"
-                        maxWidth="Infinity"/>
-
-                <Button
-                        text="卒業要件"
-                        onAction="#openGraduation"
-                        maxWidth="Infinity"/>
-
+                <Label text="メニュー" styleClass="section-title"/>
+                <Button text="ダッシュボード" onAction="#openDashboard" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="履修科目" onAction="#openEnrollment" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="成績" onAction="#openGrade" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="カリキュラム" onAction="#openCurriculum" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="卒業要件" onAction="#openGraduation" maxWidth="Infinity" styleClass="nav-button"/>
             </VBox>
 
-            <!-- 各画面を表示する領域 -->
-            <StackPane
-                    fx:id="contentPane"
-                    HBox.hgrow="ALWAYS"/>
-
+            <StackPane fx:id="contentPane" minWidth="0" HBox.hgrow="ALWAYS" styleClass="content-area"/>
         </HBox>
     </center>
 

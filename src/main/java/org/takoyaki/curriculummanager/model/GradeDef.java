@@ -1,20 +1,5 @@
 package org.takoyaki.curriculummanager.model;
 
-/**
- * 成績の定義を表すモデルクラスです。
- * <p>
- * 例:
- * <p>
- * S → 4.0
- * A → 3.0
- * B → 2.0
- * C → 1.0
- * D → 0.0
- * N → GPA対象外
- * <p>
- * 成績をenumで固定せず、データベースで管理することで
- * 大学ごとの異なる成績制度にも対応できます。
- */
 public class GradeDef {
     private Integer id;
     private String symbol;

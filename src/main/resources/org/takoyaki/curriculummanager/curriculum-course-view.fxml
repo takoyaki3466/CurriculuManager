@@ -7,159 +7,66 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane
         xmlns="http://javafx.com/javafx"
         xmlns:fx="http://javafx.com/fxml"
-        fx:controller="org.takoyaki.curriculummanager.controller.CurriculumCourseController">
+        fx:controller="org.takoyaki.curriculummanager.controller.CurriculumCourseController"
+        stylesheets="@style.css"
+        styleClass="page">
 
-    <!--
-        画面上部。
-
-        学部 → カリキュラム → カテゴリ
-        の順番で選択します。
-    -->
     <top>
-
-        <VBox spacing="12">
-
+        <VBox spacing="10">
             <padding>
-                <Insets
-                        top="15"
-                        right="15"
-                        bottom="15"
-                        left="15"/>
+                <Insets top="14" right="14" bottom="10" left="14"/>
             </padding>
 
-            <!-- 画面タイトル -->
-            <Label
-                    text="カリキュラム科目設定"
-                    style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+            <Label text="カリキュラム科目設定" styleClass="title-label"/>
 
-            <!-- 選択部分 -->
-            <HBox
-                    spacing="10"
-                    alignment="CENTER_LEFT">
+            <FlowPane styleClass="toolbar-card,responsive-flow" prefWrapLength="760">
+                <HBox styleClass="field-group">
+                    <Label text="学部"/>
+                    <ComboBox fx:id="departmentComboBox" styleClass="compact-combo" promptText="学部を選択"/>
+                </HBox>
 
-                <!-- 学部 -->
-                <Label
-                        text="学部"/>
+                <HBox styleClass="field-group">
+                    <Label text="カリキュラム"/>
+                    <ComboBox fx:id="curriculumComboBox" styleClass="wide-combo" promptText="カリキュラムを選択"/>
+                </HBox>
 
-                <ComboBox
-                        fx:id="departmentComboBox"
-                        prefWidth="200"
-                        promptText="学部を選択"/>
-
-                <!-- カリキュラム -->
-                <Label
-                        text="カリキュラム"/>
-
-                <ComboBox
-                        fx:id="curriculumComboBox"
-                        prefWidth="250"
-                        promptText="カリキュラムを選択"/>
-
-                <!-- カテゴリ -->
-                <Label
-                        text="カテゴリ"/>
-
-                <ComboBox
-                        fx:id="categoryComboBox"
-                        prefWidth="220"
-                        promptText="カテゴリを選択"/>
-
-            </HBox>
-
+                <HBox styleClass="field-group">
+                    <Label text="カテゴリ"/>
+                    <ComboBox fx:id="categoryComboBox" styleClass="compact-combo" promptText="カテゴリを選択"/>
+                </HBox>
+            </FlowPane>
         </VBox>
-
     </top>
 
-    <!--
-        中央部分。
-
-        選択したカテゴリに所属する
-        科目一覧を表示します。
-    -->
     <center>
+        <VBox spacing="10" styleClass="card">
+            <BorderPane.margin>
+                <Insets top="2" right="14" bottom="14" left="14"/>
+            </BorderPane.margin>
 
-        <VBox
-                spacing="10">
+            <Label text="科目" styleClass="section-title"/>
 
-            <padding>
-                <Insets
-                        top="0"
-                        right="15"
-                        bottom="15"
-                        left="15"/>
-            </padding>
-
-            <!-- 説明 -->
-            <Label
-                    text="科目"
-                    style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-
-            <!--
-                科目一覧。
-
-                Controller側から
-                CurriculumCourseDisplay
-                を設定します。
-            -->
-            <TableView
-                    fx:id="courseTable"
-                    VBox.vgrow="ALWAYS">
-
+            <TableView fx:id="courseTable" VBox.vgrow="ALWAYS">
                 <columns>
-
-                    <!-- 科目コード -->
-                    <TableColumn
-                            fx:id="courseCodeColumn"
-                            text="科目コード"
-                            prefWidth="140"/>
-
-                    <!-- 科目名 -->
-                    <TableColumn
-                            fx:id="courseNameColumn"
-                            text="科目名"
-                            prefWidth="350"/>
-
-                    <!-- 単位 -->
-                    <TableColumn
-                            fx:id="creditsColumn"
-                            text="単位"
-                            prefWidth="80"/>
-
-                    <!-- 必修 / 選択 -->
-                    <TableColumn
-                            fx:id="requirementTypeColumn"
-                            text="区分"
-                            prefWidth="140"/>
-
+                    <TableColumn fx:id="courseCodeColumn" text="科目コード" minWidth="115" prefWidth="140"/>
+                    <TableColumn fx:id="courseNameColumn" text="科目名" minWidth="240" prefWidth="360"/>
+                    <TableColumn fx:id="creditsColumn" text="単位" minWidth="70" prefWidth="80"/>
+                    <TableColumn fx:id="requirementTypeColumn" text="区分" minWidth="110" prefWidth="140"/>
                 </columns>
-
             </TableView>
 
-            <!--
-                科目のカリキュラム登録・解除。
-            -->
-            <HBox
-                    spacing="10"
-                    alignment="CENTER_RIGHT">
-
-                <Button
-                        text="カリキュラムに追加"
-                        onAction="#addCourse"/>
-
-                <Button
-                        text="カリキュラムから外す"
-                        onAction="#removeCourse"/>
-
-            </HBox>
-
+            <FlowPane styleClass="responsive-flow" alignment="CENTER_RIGHT" prefWrapLength="760">
+                <Button text="カリキュラムに追加" onAction="#addCourse" styleClass="primary-button"/>
+                <Button text="カリキュラムから外す" onAction="#removeCourse" styleClass="danger-button"/>
+            </FlowPane>
         </VBox>
-
     </center>
 
 </BorderPane>

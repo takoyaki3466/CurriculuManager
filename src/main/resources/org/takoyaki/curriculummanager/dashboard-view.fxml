@@ -2,103 +2,100 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox
+<ScrollPane
         xmlns="http://javafx.com/javafx"
         xmlns:fx="http://javafx.com/fxml"
         fx:controller="org.takoyaki.curriculummanager.controller.DashboardController"
-        spacing="25">
+        stylesheets="@style.css"
+        styleClass="content-scroll"
+        fitToWidth="true"
+        hbarPolicy="AS_NEEDED"
+        vbarPolicy="AS_NEEDED">
 
-    <padding>
-        <Insets
-                top="20"
-                right="20"
-                bottom="20"
-                left="20"/>
-    </padding>
+    <content>
+        <VBox spacing="14" styleClass="page" minWidth="0">
+            <padding>
+                <Insets top="14" right="14" bottom="14" left="14"/>
+            </padding>
 
-    <!-- タイトル -->
-    <Label
-            text="ダッシュボード"
-            style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+            <Label text="ダッシュボード" styleClass="title-label"/>
 
-    <!-- 全年度を対象にした全体集計 -->
-    <HBox spacing="55" alignment="CENTER_LEFT">
+            <VBox spacing="9" styleClass="toolbar-card">
+                <Label fx:id="academicContextLabel" text="学部・学科未設定" styleClass="context-label"/>
 
-        <VBox spacing="5">
-            <Label text="全年度 合計GPA" style="-fx-font-size: 14px;"/>
-            <Label fx:id="gpaLabel" text="0.00" style="-fx-font-size: 30px; -fx-font-weight: bold;"/>
+                <FlowPane styleClass="responsive-flow" prefWrapLength="760">
+                    <HBox styleClass="field-group">
+                        <Label text="学部"/>
+                        <ComboBox fx:id="departmentComboBox" styleClass="compact-combo" promptText="学部を選択"/>
+                    </HBox>
+                    <Button text="学部追加" onAction="#addDepartment" styleClass="primary-button"/>
+
+                    <HBox styleClass="field-group">
+                        <Label text="学科"/>
+                        <ComboBox fx:id="majorComboBox" styleClass="compact-combo" promptText="学科を選択"/>
+                    </HBox>
+                    <Button text="学科追加" onAction="#addMajor" styleClass="primary-button"/>
+                </FlowPane>
+            </VBox>
+
+            <FlowPane styleClass="responsive-flow" prefWrapLength="760">
+                <VBox spacing="5" styleClass="card,dashboard-card">
+                    <Label text="全年度 合計GPA" styleClass="dashboard-caption"/>
+                    <Label fx:id="gpaLabel" text="0.00" styleClass="dashboard-value"/>
+                </VBox>
+
+                <VBox spacing="5" styleClass="card,dashboard-card">
+                    <Label text="全年度 合計修得単位" styleClass="dashboard-caption"/>
+                    <Label fx:id="earnedCreditsLabel" text="0.0 単位" styleClass="dashboard-value"/>
+                </VBox>
+
+                <VBox spacing="5" styleClass="card,dashboard-card">
+                    <Label text="現在の卒業判定" styleClass="dashboard-caption"/>
+                    <Label fx:id="graduationPossibleLabel" text="卒業不可" styleClass="dashboard-value"/>
+                </VBox>
+
+                <Button text="情報を更新" onAction="#refresh" styleClass="secondary-button"/>
+            </FlowPane>
+
+            <!-- 小画面では縦に並べることで左右の圧迫を防ぐ -->
+            <VBox spacing="14" VBox.vgrow="ALWAYS">
+                <VBox spacing="8" styleClass="card">
+                    <Label text="年度別 GPA・修得単位" styleClass="section-title"/>
+
+                    <TableView fx:id="yearlySummaryTable" prefHeight="220">
+                        <columns>
+                            <TableColumn fx:id="yearColumn" text="年度" minWidth="90" prefWidth="100"/>
+                            <TableColumn fx:id="yearlyGpaColumn" text="GPA" minWidth="90" prefWidth="110"/>
+                            <TableColumn fx:id="yearlyCreditsColumn" text="修得単位" minWidth="120" prefWidth="150"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="年度が登録された履修はありません。"/>
+                        </placeholder>
+                    </TableView>
+                </VBox>
+
+                <VBox spacing="8" styleClass="card" VBox.vgrow="ALWAYS">
+                    <Label text="カリキュラム・卒業要件一覧" styleClass="section-title"/>
+
+                    <ListView fx:id="curriculumRequirementListView"
+                              prefHeight="260"
+                              VBox.vgrow="ALWAYS">
+                        <placeholder>
+                            <Label text="登録されているカリキュラムがありません。"/>
+                        </placeholder>
+                    </ListView>
+                </VBox>
+            </VBox>
         </VBox>
-
-        <VBox spacing="5">
-            <Label text="全年度 合計修得単位" style="-fx-font-size: 14px;"/>
-            <Label fx:id="earnedCreditsLabel" text="0.0 単位" style="-fx-font-size: 30px; -fx-font-weight: bold;"/>
-        </VBox>
-
-        <VBox spacing="5">
-            <Label text="現在の卒業判定" style="-fx-font-size: 14px;"/>
-            <Label fx:id="graduationPossibleLabel" text="卒業不可" style="-fx-font-size: 30px; -fx-font-weight: bold;"/>
-        </VBox>
-
-        <Button text="情報を更新" onAction="#refresh" prefWidth="130"/>
-
-    </HBox>
-
-    <!-- ダッシュボード本体 -->
-    <HBox
-            spacing="40"
-            VBox.vgrow="ALWAYS">
-
-        <!-- 左側：年度別の情報 -->
-        <VBox
-                spacing="10"
-                prefWidth="390">
-
-            <Label text="年度別 GPA・修得単位" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-
-            <TableView fx:id="yearlySummaryTable" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="yearColumn" text="年度" prefWidth="100"/>
-                    <TableColumn fx:id="yearlyGpaColumn" text="GPA" prefWidth="120"/>
-                    <TableColumn fx:id="yearlyCreditsColumn" text="修得単位" prefWidth="150"/>
-                </columns>
-                <placeholder>
-                    <Label text="年度が登録された履修はありません。"/>
-                </placeholder>
-            </TableView>
-
-        </VBox>
-
-        <!-- 右側：カリキュラム一覧 -->
-        <VBox
-                spacing="10"
-                HBox.hgrow="ALWAYS">
-
-            <Label
-                    text="カリキュラム・卒業要件一覧"
-                    style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-
-            <ListView
-                    fx:id="curriculumRequirementListView"
-                    VBox.vgrow="ALWAYS"
-                    HBox.hgrow="ALWAYS">
-
-                <!-- 一覧が空の場合に表示するNode -->
-                <placeholder>
-                    <Label
-                            text="登録されているカリキュラムがありません。"/>
-                </placeholder>
-
-            </ListView>
-
-        </VBox>
-
-    </HBox>
-
-</VBox>
+    </content>
+</ScrollPane>

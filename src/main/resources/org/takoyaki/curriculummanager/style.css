@@ -1,0 +1,363 @@
+/* CurriculumManager 共通スタイル
+   小さい画面でも崩れにくいレスポンシブ寄りの設定 */
+
+.root {
+    -fx-font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #f5f6f8;
+    -fx-text-fill: #22252a;
+}
+
+.page {
+    -fx-background-color: #f5f6f8;
+}
+
+.app-header {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #e2e5e9 transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.sidebar {
+    -fx-background-color: #eef0f3;
+    -fx-border-color: transparent #dde1e6 transparent transparent;
+    -fx-border-width: 0 1px 0 0;
+}
+
+.content-area {
+    -fx-background-color: #f5f6f8;
+}
+
+.card,
+.toolbar-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #e0e3e7;
+    -fx-border-width: 1px;
+}
+
+.card {
+    -fx-padding: 12px;
+}
+
+.toolbar-card {
+    -fx-padding: 10px;
+}
+
+.label {
+    -fx-text-fill: #22252a;
+}
+
+.title-label {
+    -fx-font-size: 21px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202327;
+}
+
+.app-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202327;
+}
+
+.section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #30343a;
+}
+
+.context-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #30343a;
+}
+
+.secondary-label,
+.dashboard-caption {
+    -fx-text-fill: #70757d;
+}
+
+.dashboard-caption {
+    -fx-font-size: 13px;
+}
+
+.dashboard-value {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #30343a;
+}
+
+.status-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.button {
+    -fx-background-color: #e4e7eb;
+    -fx-text-fill: #25282d;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-padding: 7px 12px;
+    -fx-cursor: hand;
+    -fx-min-height: 32px;
+}
+
+.button:hover {
+    -fx-background-color: #d8dce1;
+}
+
+.button:pressed {
+    -fx-background-color: #cbd0d6;
+}
+
+.primary-button {
+    -fx-background-color: #536f8a;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.primary-button:hover {
+    -fx-background-color: #465f77;
+}
+
+.primary-button:pressed {
+    -fx-background-color: #3c5267;
+}
+
+.secondary-button {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #30343a;
+    -fx-border-color: #cfd4da;
+    -fx-border-width: 1px;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #f0f2f4;
+}
+
+.danger-button {
+    -fx-background-color: #b46060;
+    -fx-text-fill: #ffffff;
+}
+
+.danger-button:hover {
+    -fx-background-color: #9f5252;
+}
+
+.danger-button:pressed {
+    -fx-background-color: #894747;
+}
+
+.sidebar .button,
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #30343a;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 9px 10px;
+}
+
+.sidebar .button:hover,
+.nav-button:hover {
+    -fx-background-color: #dde1e6;
+}
+
+.sidebar .button:pressed,
+.nav-button:pressed {
+    -fx-background-color: #d1d6dc;
+}
+
+.text-field,
+.text-area {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cfd4da;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 6px 8px;
+}
+
+.text-field:focused,
+.text-area:focused {
+    -fx-border-color: #748da5;
+    -fx-border-width: 1.5px;
+}
+
+.combo-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cfd4da;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-min-height: 32px;
+}
+
+.combo-box:hover {
+    -fx-border-color: #b5bbc2;
+}
+
+.combo-box:focused {
+    -fx-border-color: #748da5;
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.list-view,
+.table-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d6d9de;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+.list-cell {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #25282d;
+    -fx-padding: 7px 10px;
+}
+
+.list-cell:hover {
+    -fx-background-color: #f1f3f5;
+}
+
+.list-cell:selected {
+    -fx-background-color: #dfe7ee;
+    -fx-text-fill: #25282d;
+}
+
+.table-view {
+    -fx-padding: 0;
+}
+
+.table-view .virtual-flow {
+    -fx-background-color: #ffffff;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #eceef1;
+    -fx-background-radius: 6px 6px 0 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #d6d9de transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: 6px 7px;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #30343a;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #eceef1 transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #f5f6f7;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #dfe7ee;
+}
+
+.table-row-cell:selected .text {
+    -fx-fill: #25282d;
+}
+
+.table-cell {
+    -fx-text-fill: #25282d;
+    -fx-padding: 6px 7px;
+    -fx-border-color: transparent;
+}
+
+.table-view .placeholder .label {
+    -fx-text-fill: #7a8088;
+}
+
+/* 小画面で各入力ブロックを折り返すためのFlowPane */
+.responsive-flow {
+    -fx-hgap: 10px;
+    -fx-vgap: 8px;
+    -fx-alignment: center-left;
+}
+
+/* ラベル＋入力欄を1まとまりとして折り返す */
+.field-group {
+    -fx-spacing: 6px;
+    -fx-alignment: center-left;
+}
+
+/* 横方向に長い内容は ScrollPane 内で扱う */
+.content-scroll,
+.content-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.content-scroll {
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+}
+
+/* 横幅が狭くても文字が極端に詰まりにくい */
+.compact-combo {
+    -fx-pref-width: 210px;
+    -fx-min-width: 150px;
+}
+
+.short-combo {
+    -fx-pref-width: 110px;
+    -fx-min-width: 90px;
+}
+
+.wide-combo {
+    -fx-pref-width: 260px;
+    -fx-min-width: 180px;
+}
+
+.dashboard-card {
+    -fx-pref-width: 200px;
+    -fx-min-width: 170px;
+}
+
+.check-box {
+    -fx-text-fill: #25282d;
+}
+
+.check-box .box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #bcc2c9;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #536f8a;
+    -fx-border-color: #536f8a;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #ffffff;
+}
+
+.radio-button {
+    -fx-text-fill: #25282d;
+}
+
+.radio-button .radio {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #bcc2c9;
+    -fx-border-radius: 50%;
+    -fx-background-radius: 50%;
+}
+
+.radio-button:selected .dot {
+    -fx-background-color: #536f8a;
+}

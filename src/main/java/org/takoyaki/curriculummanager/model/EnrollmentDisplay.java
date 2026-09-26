@@ -2,23 +2,7 @@ package org.takoyaki.curriculummanager.model;
 
 import java.util.Objects;
 
-/**
- * 履修一覧画面に表示するためのデータをまとめたクラスです。
- * <p>
- * EnrollmentにはcourseIdやgradeIdしか入っていないため、
- * 画面で必要になる
- * <p>
- * ・科目名
- * ・科目コード
- * ・単位数
- * ・成績
- * <p>
- * などをまとめて保持します。
- * <p>
- * これはデータベースのテーブルと1対1で対応するModelではなく、
- * GUI表示用のModelです。
- */
-public final class EnrollmentDisplay {
+public class EnrollmentDisplay {
     private final Integer enrollmentId;
     private final int year;
     private final String semester;
@@ -29,9 +13,6 @@ public final class EnrollmentDisplay {
     private final Integer gradeId;
     private final String gradeSymbol;
 
-    /**
-     *
-     */
     public EnrollmentDisplay(Integer enrollmentId, int year, String semester, Integer courseId, String courseCode, String courseName, double credits, Integer gradeId, String gradeSymbol) {
         this.enrollmentId = enrollmentId;
         this.year = year;
@@ -83,6 +64,7 @@ public final class EnrollmentDisplay {
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
+
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (EnrollmentDisplay) obj;
         return Objects.equals(this.enrollmentId, that.enrollmentId) &&
@@ -114,5 +96,4 @@ public final class EnrollmentDisplay {
                 "gradeId=" + gradeId + ", " +
                 "gradeSymbol=" + gradeSymbol + ']';
     }
-
 }

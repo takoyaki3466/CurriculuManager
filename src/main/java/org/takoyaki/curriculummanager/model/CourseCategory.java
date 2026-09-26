@@ -1,31 +1,5 @@
 package org.takoyaki.curriculummanager.model;
 
-/**
- * 科目カテゴリーを表すモデルクラス。
- * <p>
- * 科目カテゴリーは階層構造を持つことができます。
- * <p>
- * 例:
- * <p>
- * 一般教養
- * ├─ グループ1
- * ├─ グループ2
- * ├─ グループ3
- * └─ グループ4
- * <p>
- * 基礎教育
- * ├─ グローバルスキル
- * ├─ 数学
- * ├─ 物理
- * └─ 化学
- * <p>
- * 専門科目
- * ├─ 専門基礎
- * └─ 専門応用
- * <p>
- * 親カテゴリーを持たないカテゴリーは
- * parentId が null になります。
- */
 public class CourseCategory {
     private Integer id;
     private Integer curriculumId;

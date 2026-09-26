@@ -1,20 +1,5 @@
 package org.takoyaki.curriculummanager.model;
 
-/**
- * 科目そのものを表すモデルクラス。
- * <p>
- * 科目は特定の学科だけに所属するものではなく、
- * システム全体で共有できるように設計します。
- * <p>
- * 例:
- * <p>
- * 科目名: プログラミング基礎
- * 科目コード: CS101
- * 単位数: 2
- * <p>
- * 「必修」「選択」などの情報はこのクラスには持たせません。
- * それらは CurriculumCourse が担当します。
- */
 public class Course {
     private Integer id;
     private String courseCode;
