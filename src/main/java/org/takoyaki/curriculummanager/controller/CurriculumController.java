@@ -3,18 +3,25 @@ package org.takoyaki.curriculummanager.controller;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.GridPane;
 
 import org.takoyaki.curriculummanager.model.Course;
 import org.takoyaki.curriculummanager.model.CourseCategory;
 import org.takoyaki.curriculummanager.model.Curriculum;
+import org.takoyaki.curriculummanager.model.CurriculumCourse;
 import org.takoyaki.curriculummanager.model.Department;
 import org.takoyaki.curriculummanager.model.Major;
 import org.takoyaki.curriculummanager.service.CourseCategoryService;
@@ -25,6 +32,8 @@ import org.takoyaki.curriculummanager.service.DepartmentService;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -67,6 +76,9 @@ public class CurriculumController {
     private TableColumn<Course, String> creditsColumn;
 
     @FXML
+    private TableColumn<Course, String> requirementTypeColumn;
+
+    @FXML
     private TextArea descriptionArea;
 
     /*
@@ -99,6 +111,8 @@ public class CurriculumController {
      * カリキュラムと科目の関連を管理するService。
      */
     private final CurriculumCourseService curriculumCourseService;
+
+    private final Map<Integer, String> requirementTypesByCourseId = new HashMap<>();
 
     /**
      * Controllerを生成します。
@@ -139,6 +153,8 @@ public class CurriculumController {
         courseNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
 
         creditsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getCredits())));
+
+        requirementTypeColumn.setCellValueFactory(cellData -> new SimpleStringProperty(requirementTypesByCourseId.getOrDefault(cellData.getValue().getId(), "")));
 
         courseTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> showCourseDescription(newValue));
     }
@@ -348,6 +364,7 @@ public class CurriculumController {
         categoryList.getItems().clear();
         courseTable.getItems().clear();
         descriptionArea.clear();
+        requirementTypesByCourseId.clear();
 
         if (department == null || department.getId() == null) {
 
@@ -430,7 +447,15 @@ public class CurriculumController {
 
         List<Curriculum> curricula = service.getCurricula(major.getId());
 
-        curriculumComboBox.setItems(FXCollections.observableArrayList(curricula));
+        var items = FXCollections.<Curriculum>observableArrayList();
+
+        items.add(Curriculum.allOption());
+
+        items.addAll(curricula);
+
+        curriculumComboBox.setItems(items);
+
+        curriculumComboBox.getSelectionModel().selectFirst();
     }
 
     /**
@@ -520,7 +545,7 @@ public class CurriculumController {
 
         Curriculum curriculum = curriculumComboBox.getValue();
 
-        if (curriculum == null) {
+        if (curriculum == null || curriculum.isAllOption()) {
 
             showError("カリキュラム編集", new Exception("編集するカリキュラムを選択してください。"));
 
@@ -581,7 +606,7 @@ public class CurriculumController {
 
         Curriculum curriculum = curriculumComboBox.getValue();
 
-        if (curriculum == null) {
+        if (curriculum == null || curriculum.isAllOption()) {
 
             showError("カリキュラム削除", new Exception("削除するカリキュラムを選択してください。"));
 
@@ -663,7 +688,26 @@ public class CurriculumController {
 
         try {
 
-            categories = courseCategoryService.getCategories(curriculum.getId());
+            if (curriculum.isAllOption()) {
+
+                Major major = majorComboBox.getValue();
+
+                List<Integer> curriculumIds = major == null
+
+                        ? List.of()
+
+                        : service.getCurricula(major.getId()).stream().map(Curriculum::getId).toList();
+
+                categories = courseCategoryService.getAllCategories().stream()
+
+                        .filter(category -> curriculumIds.contains(category.getCurriculumId()))
+
+                        .toList();
+
+            } else {
+
+                categories = courseCategoryService.getCategories(curriculum.getId());
+            }
 
         } catch (Exception e) {
 
@@ -671,6 +715,19 @@ public class CurriculumController {
         }
 
         categoryList.setItems(FXCollections.observableArrayList(categories));
+
+        if (curriculum.isAllOption()) {
+
+            List<Integer> categoryIds = categories.stream().map(CourseCategory::getId).toList();
+
+            List<Course> courses = courseService.getAllCourses().stream()
+
+                    .filter(course -> categoryIds.contains(course.getCategoryId()))
+
+                    .toList();
+
+            courseTable.setItems(FXCollections.observableArrayList(courses));
+        }
     }
 
     /**
@@ -681,9 +738,9 @@ public class CurriculumController {
 
         Curriculum curriculum = curriculumComboBox.getSelectionModel().getSelectedItem();
 
-        if (curriculum == null) {
+        if (curriculum == null || curriculum.isAllOption()) {
 
-            showError("先にカリキュラムを選択してください。");
+            showError("追加先のカリキュラムを選択してください。");
 
             return;
         }
@@ -865,6 +922,7 @@ public class CurriculumController {
 
         courseTable.getItems().clear();
         descriptionArea.clear();
+        requirementTypesByCourseId.clear();
 
         if (category == null || category.getId() == null) {
 
@@ -876,6 +934,16 @@ public class CurriculumController {
         try {
 
             courses = courseService.getCoursesByCategoryId(category.getId());
+
+            Curriculum curriculum = curriculumComboBox.getValue();
+
+            if (curriculum != null && !curriculum.isAllOption()) {
+
+                for (CurriculumCourse relation : curriculumCourseService.getCurriculumCourses(curriculum.getId())) {
+
+                    requirementTypesByCourseId.put(relation.getCourseId(), relation.getRequirementType());
+                }
+            }
 
         } catch (Exception e) {
 
@@ -895,9 +963,9 @@ public class CurriculumController {
 
         CourseCategory category = categoryList.getSelectionModel().getSelectedItem();
 
-        if (curriculum == null) {
+        if (curriculum == null || curriculum.isAllOption()) {
 
-            showError("先にカリキュラムを選択してください。");
+            showError("追加先のカリキュラムを選択してください。");
 
             return;
         }
@@ -909,84 +977,18 @@ public class CurriculumController {
             return;
         }
 
-        TextInputDialog codeDialog = new TextInputDialog();
+        Optional<CourseFormResult> courseResult = showCourseDialog(null, category, "選択", "科目追加", "追加");
 
-        codeDialog.setTitle("科目追加");
+        if (courseResult.isEmpty()) {
 
-        codeDialog.setHeaderText("科目コードを入力します。");
-
-        codeDialog.setContentText("科目コード:");
-
-        Optional<String> codeResult = codeDialog.showAndWait();
-
-        if (codeResult.isEmpty()) {
             return;
         }
-
-        String courseCode = codeResult.get().trim();
-
-        TextInputDialog nameDialog = new TextInputDialog();
-
-        nameDialog.setTitle("科目追加");
-
-        nameDialog.setHeaderText("科目名を入力します。");
-
-        nameDialog.setContentText("科目名:");
-
-        Optional<String> nameResult = nameDialog.showAndWait();
-
-        if (nameResult.isEmpty()) {
-            return;
-        }
-
-        String name = nameResult.get().trim();
-
-        TextInputDialog creditDialog = new TextInputDialog();
-
-        creditDialog.setTitle("科目追加");
-
-        creditDialog.setHeaderText("単位数を入力します。");
-
-        creditDialog.setContentText("単位:");
-
-        Optional<String> creditResult = creditDialog.showAndWait();
-
-        if (creditResult.isEmpty()) {
-            return;
-        }
-
-        double credits;
 
         try {
 
-            credits = Double.parseDouble(creditResult.get().trim());
+            CourseFormResult formResult = courseResult.get();
 
-        } catch (NumberFormatException e) {
-
-            showError("単位には数字を入力してください。");
-
-            return;
-        }
-
-        TextInputDialog descriptionDialog = new TextInputDialog();
-
-        descriptionDialog.setTitle("科目追加");
-
-        descriptionDialog.setHeaderText("科目説明を入力します。");
-
-        descriptionDialog.setContentText("説明:");
-
-        Optional<String> descriptionResult = descriptionDialog.showAndWait();
-
-        if (descriptionResult.isEmpty()) {
-            return;
-        }
-
-        String description = descriptionResult.get().trim();
-
-        try {
-
-            Course course = new Course(courseCode, name, credits, category.getId(), description);
+            Course course = formResult.course();
 
             courseService.addCourse(course);
 
@@ -994,7 +996,7 @@ public class CurriculumController {
              * 作成した科目を
              * 現在のカリキュラムへ関連付けます。
              */
-            curriculumCourseService.addCourseToCurriculum(curriculum.getId(), course.getId(), "選択");
+            curriculumCourseService.addCourseToCurriculum(curriculum.getId(), course.getId(), formResult.requirementType());
 
             loadCourses(category);
 
@@ -1002,6 +1004,203 @@ public class CurriculumController {
 
             showError("科目の追加に失敗しました。", e);
         }
+    }
+
+    /**
+     * 選択中の科目と必修・選択区分を編集します。
+     */
+    @FXML
+    private void editCourse() {
+
+        Curriculum curriculum = curriculumComboBox.getValue();
+
+        CourseCategory category = categoryList.getSelectionModel().getSelectedItem();
+
+        Course course = courseTable.getSelectionModel().getSelectedItem();
+
+        if (curriculum == null || curriculum.isAllOption() || category == null || course == null) {
+
+            showError("編集する科目を選択してください。");
+
+            return;
+        }
+
+        try {
+
+            CurriculumCourse relation = curriculumCourseService.getCurriculumCourses(curriculum.getId()).stream()
+
+                    .filter(item -> course.getId().equals(item.getCourseId()))
+
+                    .findFirst()
+
+                    .orElse(null);
+
+            String requirementType = relation == null || relation.getRequirementType() == null || relation.getRequirementType().isBlank()
+
+                    ? "選択"
+
+                    : relation.getRequirementType();
+
+            Optional<CourseFormResult> result = showCourseDialog(course, category, requirementType, "科目編集", "保存");
+
+            if (result.isEmpty()) {
+
+                return;
+            }
+
+            CourseFormResult formResult = result.get();
+
+            Course edited = formResult.course();
+
+            course.setCourseCode(edited.getCourseCode());
+
+            course.setName(edited.getName());
+
+            course.setCredits(edited.getCredits());
+
+            course.setDescription(edited.getDescription());
+
+            courseService.updateCourse(course);
+
+            if (relation == null) {
+
+                curriculumCourseService.addCourseToCurriculum(curriculum.getId(), course.getId(), formResult.requirementType());
+
+            } else {
+
+                relation.setRequirementType(formResult.requirementType());
+
+                curriculumCourseService.update(relation);
+            }
+
+            loadCourses(category);
+
+            courseTable.getItems().stream()
+
+                    .filter(item -> course.getId().equals(item.getId()))
+
+                    .findFirst()
+
+                    .ifPresent(item -> courseTable.getSelectionModel().select(item));
+
+        } catch (Exception e) {
+
+            showError("科目の編集に失敗しました。", e);
+        }
+    }
+
+    private Optional<CourseFormResult> showCourseDialog(Course course, CourseCategory category, String requirementType, String title, String saveText) {
+
+        Dialog<CourseFormResult> dialog = new Dialog<>();
+
+        dialog.setTitle(title);
+
+        dialog.setHeaderText("科目の情報と必修・選択区分をまとめて入力してください。");
+
+        ButtonType saveButtonType = new ButtonType(saveText, ButtonBar.ButtonData.OK_DONE);
+
+        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
+
+        TextField courseCodeField = new TextField(course == null || course.getCourseCode() == null ? "" : course.getCourseCode());
+
+        courseCodeField.setPromptText("例: CS101");
+
+        TextField courseNameField = new TextField(course == null || course.getName() == null ? "" : course.getName());
+
+        courseNameField.setPromptText("例: プログラミング基礎");
+
+        TextField creditsField = new TextField(course == null ? "" : String.valueOf(course.getCredits()));
+
+        creditsField.setPromptText("例: 2");
+
+        ComboBox<String> requirementTypeComboBox = new ComboBox<>(FXCollections.observableArrayList("必修", "選択"));
+
+        requirementTypeComboBox.setValue(requirementType);
+
+        TextArea memoArea = new TextArea(course == null || course.getDescription() == null ? "" : course.getDescription());
+
+        memoArea.setPromptText("補足事項（任意）");
+
+        memoArea.setPrefRowCount(4);
+
+        memoArea.setWrapText(true);
+
+        GridPane form = new GridPane();
+
+        form.setHgap(12);
+
+        form.setVgap(10);
+
+        form.setPrefWidth(460);
+
+        form.addRow(0, new Label("授業コード"), courseCodeField);
+
+        form.addRow(1, new Label("授業名"), courseNameField);
+
+        form.addRow(2, new Label("単位数"), creditsField);
+
+        form.addRow(3, new Label("区分"), requirementTypeComboBox);
+
+        form.addRow(4, new Label("メモ"), memoArea);
+
+        dialog.getDialogPane().setContent(form);
+
+        Node saveButton = dialog.getDialogPane().lookupButton(saveButtonType);
+
+        saveButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+
+            if (courseCodeField.getText().isBlank() || courseNameField.getText().isBlank()) {
+
+                showError("授業コードと授業名を入力してください。");
+
+                event.consume();
+
+                return;
+            }
+
+            try {
+
+                double credits = Double.parseDouble(creditsField.getText().trim());
+
+                if (!Double.isFinite(credits) || credits < 0) {
+
+                    throw new NumberFormatException();
+                }
+
+            } catch (NumberFormatException e) {
+
+                showError("単位数は0以上の数値で入力してください。");
+
+                event.consume();
+            }
+        });
+
+        dialog.setResultConverter(button -> {
+
+            if (button != saveButtonType) {
+
+                return null;
+            }
+
+            Course resultCourse = new Course(
+
+                    courseCodeField.getText().trim(),
+
+                    courseNameField.getText().trim(),
+
+                    Double.parseDouble(creditsField.getText().trim()),
+
+                    category.getId(),
+
+                    memoArea.getText().trim());
+
+            return new CourseFormResult(resultCourse, requirementTypeComboBox.getValue());
+        });
+
+        return dialog.showAndWait();
+    }
+
+    private record CourseFormResult(Course course, String requirementType) {
     }
 
     /**

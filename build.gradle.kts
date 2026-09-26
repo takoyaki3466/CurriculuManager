@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "org.takoyaki"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 repositories {
     mavenCentral()
@@ -26,30 +26,70 @@ tasks.withType<JavaCompile> {
 }
 
 application {
-    mainModule.set("org.takoyaki.curriculummanager")
-    mainClass.set("org.takoyaki.curriculummanager.HelloApplication")
+    mainModule.set(
+        "org.takoyaki.curriculummanager"
+    )
+
+    mainClass.set(
+        "org.takoyaki.curriculummanager.HelloApplication"
+    )
 }
 
 javafx {
-    version = "21.0.6"
-    modules = listOf("javafx.controls", "javafx.fxml")
+    version = "21.0.12"
+
+    modules = listOf(
+        "javafx.controls", "javafx.fxml"
+    )
 }
 
 dependencies {
-    implementation("org.xerial:sqlite-jdbc:3.50.3.0")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    implementation(
+        "org.xerial:sqlite-jdbc:3.50.3.0"
+    )
+
+    testImplementation(
+        "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    )
+
+    testRuntimeOnly(
+        "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+    )
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+var baseName = "履修管理くん"
+
 jlink {
-    imageZip.set(layout.buildDirectory.file("/distributions/app-${javafx.platform.classifier}.zip"))
-    options.set(listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"))
+
+    options.set(
+        listOf(
+            "--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"
+        )
+    )
+
     launcher {
-        name = "app"
+        name = baseName
+    }
+
+    jpackage {
+
+        imageName = baseName
+
+        installerName = baseName
+
+        appVersion = "1.0.0"
+
+        icon = "src/main/resources/icon.ico"
+
+        installerType = "exe"
+
+        installerOptions = listOf(
+            "--win-menu", "--win-shortcut", "--win-dir-chooser"
+        )
     }
 }

@@ -21,15 +21,37 @@ import java.util.Set;
 
 /**
  * 卒業要件に関する処理を管理するサービス。
+ *
+ * <p>
+ * 卒業要件について、
+ * </p>
+ *
+ * <ul>
+ *     <li>必要単位数</li>
+ *     <li>修得単位数</li>
+ *     <li>残り必要単位数</li>
+ *     <li>必修科目の修得状況</li>
+ *     <li>卒業要件の対象カテゴリ</li>
+ * </ul>
+ *
+ * <p>
+ * などを管理します。
+ * </p>
  */
 public class GraduationRequirementService {
+
     private static final String REQUIREMENT_REQUIRED = "必修";
 
     private final EnrollmentRepository enrollmentRepository;
+
     private final CourseRepository courseRepository;
+
     private final CourseCategoryRepository categoryRepository;
+
     private final GradeDefRepository gradeDefRepository;
+
     private final GraduationRequirementRepository graduationRequirementRepository;
+
     private final CurriculumCourseRepository curriculumCourseRepository;
 
     public GraduationRequirementService() {
@@ -48,105 +70,47 @@ public class GraduationRequirementService {
     }
 
     /**
-     * カリキュラムが卒業要件を満たしているか確認する。
+     * カリキュラムが卒業要件を
+     * すべて満たしているか確認します。
      *
      * <p>
-     * 以下の両方を満たしている必要がある。
+     * 以下の両方を満たす必要があります。
+     * </p>
      *
      * <ul>
-     *     <li>卒業要件の必要単位を満たしている</li>
-     *     <li>必修科目をすべて修得している</li>
+     *     <li>設定されたすべての卒業要件を満たす</li>
+     *     <li>設定された必修科目をすべて修得する</li>
      * </ul>
      */
     public boolean isGraduated(Integer curriculumId) throws SQLException {
 
         validateCurriculumId(curriculumId);
 
-        /*
-         * 通常の卒業要件を確認する。
-         */
+        return areRequirementsSatisfied(curriculumId)
+
+                && isMandatoryCoursesSatisfied(curriculumId);
+    }
+
+    /**
+     * 登録されている単位要件をすべて満たしているか確認します。
+     *
+     * <p>卒業要件が1件も登録されていない場合は、達成とは扱いません。</p>
+     */
+    public boolean areRequirementsSatisfied(Integer curriculumId) throws SQLException {
+
+        validateCurriculumId(curriculumId);
+
         List<GraduationRequirement> requirements = graduationRequirementRepository.findByCurriculumId(curriculumId);
+
+        if (requirements.isEmpty()) {
+
+            return false;
+        }
 
         for (GraduationRequirement requirement : requirements) {
 
             if (!isRequirementSatisfied(requirement)) {
-                return false;
-            }
-        }
 
-        /*
-         * 必修科目を確認する。
-         */
-        return isMandatoryCoursesSatisfied(curriculumId);
-    }
-
-    /**
-     * カリキュラムに設定された必修科目を
-     * すべて修得しているか確認する。
-     */
-    public boolean isMandatoryCoursesSatisfied(Integer curriculumId) throws SQLException {
-
-        validateCurriculumId(curriculumId);
-
-        /*
-         * カリキュラムに登録されている科目を取得する。
-         */
-        var curriculumCourses = curriculumCourseRepository.findByCurriculumId(curriculumId);
-
-        /*
-         * そのカリキュラムの履修記録を取得する。
-         */
-        List<Enrollment> enrollments = enrollmentRepository.findByCurriculumId(curriculumId);
-
-        /*
-         * 修得済み科目のIDを記録する。
-         */
-        Set<Integer> passedCourseIds = new HashSet<>();
-
-        for (Enrollment enrollment : enrollments) {
-
-            Integer gradeId = enrollment.getGradeId();
-
-            /*
-             * 成績が未設定なら
-             * 修得済みではない。
-             */
-            if (gradeId == null) {
-                continue;
-            }
-
-            GradeDef grade = gradeDefRepository.findById(gradeId);
-
-            if (grade == null) {
-                continue;
-            }
-
-            /*
-             * 合格した科目だけを
-             * 修得済みとして扱う。
-             */
-            if (grade.isPassed()) {
-
-                passedCourseIds.add(enrollment.getCourseId());
-            }
-        }
-
-        /*
-         * 必修科目を1つずつ確認する。
-         */
-        for (var curriculumCourse : curriculumCourses) {
-
-            if (!REQUIREMENT_REQUIRED.equals(curriculumCourse.getRequirementType())) {
-                continue;
-            }
-
-            Integer courseId = curriculumCourse.getCourseId();
-
-            /*
-             * 必修科目が修得済みでなければ、
-             * 卒業要件を満たしていない。
-             */
-            if (!passedCourseIds.contains(courseId)) {
                 return false;
             }
         }
@@ -155,88 +119,91 @@ public class GraduationRequirementService {
     }
 
     /**
-     * カリキュラムに設定された必修科目の
-     * 修得状況を取得する。
-     *
-     * <p>
-     * 必修科目ごとに、
-     * 科目情報と修得済みかどうかをまとめて返す。
+     * 卒業単位要件が登録されているか確認します。
      */
-    public List<MandatoryCourseStatus> getMandatoryCourseStatuses(Integer curriculumId) throws SQLException {
+    public boolean hasRequirements(Integer curriculumId) throws SQLException {
 
         validateCurriculumId(curriculumId);
 
-        /*
-         * カリキュラムに登録されている科目を取得する。
-         */
+        return !graduationRequirementRepository.findByCurriculumId(curriculumId).isEmpty();
+    }
+
+    /**
+     * 必修科目が設定されているか確認します。
+     */
+    public boolean hasMandatoryCourses(Integer curriculumId) throws SQLException {
+
+        validateCurriculumId(curriculumId);
+
+        return curriculumCourseRepository.findByCurriculumId(curriculumId).stream()
+
+                .anyMatch(curriculumCourse -> isRequired(curriculumCourse.getRequirementType()));
+    }
+
+    /**
+     * カリキュラムに設定された必修科目を
+     * すべて修得しているか確認します。
+     */
+    public boolean isMandatoryCoursesSatisfied(Integer curriculumId) throws SQLException {
+
+        validateCurriculumId(curriculumId);
+
         var curriculumCourses = curriculumCourseRepository.findByCurriculumId(curriculumId);
 
-        /*
-         * 履修記録を取得する。
-         */
         List<Enrollment> enrollments = enrollmentRepository.findByCurriculumId(curriculumId);
 
-        /*
-         * 修得済み科目のIDを作成する。
-         *
-         * 同じ科目を複数回履修していても、
-         * 一度でも合格していれば修得済みとする。
-         */
-        Set<Integer> passedCourseIds = new HashSet<>();
-
-        for (Enrollment enrollment : enrollments) {
-
-            Integer gradeId = enrollment.getGradeId();
-
-            if (gradeId == null) {
-                continue;
-            }
-
-            GradeDef grade = gradeDefRepository.findById(gradeId);
-
-            if (grade == null) {
-                continue;
-            }
-
-            if (grade.isPassed()) {
-
-                passedCourseIds.add(enrollment.getCourseId());
-            }
-        }
-
-        /*
-         * 必修科目の表示用データを作成する。
-         */
-        List<MandatoryCourseStatus> statuses = new ArrayList<>();
+        Set<Integer> passedCourseIds = getPassedCourseIds(enrollments);
 
         for (var curriculumCourse : curriculumCourses) {
 
-            /*
-             * 必修ではない科目は対象外。
-             */
-            if (!REQUIREMENT_REQUIRED.equals(curriculumCourse.getRequirementType())) {
+            if (!isRequired(curriculumCourse.getRequirementType())) {
+
                 continue;
             }
 
             Integer courseId = curriculumCourse.getCourseId();
 
-            /*
-             * 科目情報を取得する。
-             */
-            var course = courseRepository.findById(courseId);
+            if (!passedCourseIds.contains(courseId)) {
 
-            /*
-             * 科目が削除されているなど、
-             * 不正な参照になっている場合は
-             * 表示対象から除外する。
-             */
-            if (course == null) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * カリキュラムに設定された
+     * 必修科目の修得状況を取得します。
+     */
+    public List<MandatoryCourseStatus> getMandatoryCourseStatuses(Integer curriculumId) throws SQLException {
+
+        validateCurriculumId(curriculumId);
+
+        var curriculumCourses = curriculumCourseRepository.findByCurriculumId(curriculumId);
+
+        List<Enrollment> enrollments = enrollmentRepository.findByCurriculumId(curriculumId);
+
+        Set<Integer> passedCourseIds = getPassedCourseIds(enrollments);
+
+        List<MandatoryCourseStatus> statuses = new ArrayList<>();
+
+        for (var curriculumCourse : curriculumCourses) {
+
+            if (!isRequired(curriculumCourse.getRequirementType())) {
+
                 continue;
             }
 
-            /*
-             * 修得済みかどうかを確認する。
-             */
+            Integer courseId = curriculumCourse.getCourseId();
+
+            var course = courseRepository.findById(courseId);
+
+            if (course == null) {
+
+                continue;
+            }
+
             boolean passed = passedCourseIds.contains(courseId);
 
             statuses.add(new MandatoryCourseStatus(course.getId(), course.getCourseCode(), course.getName(), course.getCredits(), passed));
@@ -245,8 +212,15 @@ public class GraduationRequirementService {
         return statuses;
     }
 
+    private boolean isRequired(String requirementType) {
+
+        return requirementType != null
+
+                && REQUIREMENT_REQUIRED.equals(requirementType.trim());
+    }
+
     /**
-     * 1つの卒業要件を満たしているか確認する。
+     * 指定した卒業要件を満たしているか確認します。
      */
     private boolean isRequirementSatisfied(GraduationRequirement requirement) throws SQLException {
 
@@ -256,104 +230,133 @@ public class GraduationRequirementService {
     }
 
     /**
-     * 卒業要件に対する修得単位数を取得する。
+     * 卒業要件に対する修得単位数を取得します。
+     *
+     * <p>
+     * カテゴリが設定されていない場合は
+     * カリキュラム全体を対象にします。
+     * </p>
+     *
+     * <p>
+     * 複数カテゴリが設定されている場合は、
+     * 選択されたすべてのカテゴリと
+     * その子カテゴリをまとめて対象にします。
+     * </p>
      */
     public double getEarnedCredits(GraduationRequirement requirement) throws SQLException {
 
+        if (requirement == null) {
+
+            throw new IllegalArgumentException("卒業要件が指定されていません。");
+        }
+
+        validateCurriculumId(requirement.getCurriculumId());
+
         List<Enrollment> enrollments = enrollmentRepository.findByCurriculumId(requirement.getCurriculumId());
 
+        /*
+         * 一度でも合格した科目のIDを取得します。
+         */
+        Set<Integer> passedCourseIds = getPassedCourseIds(enrollments);
+
+        /*
+         * 卒業要件の対象カテゴリと、
+         * その子カテゴリをすべて取得します。
+         */
+        Set<Integer> targetCategoryIds = collectTargetCategoryIds(requirement.getCategoryIds());
+
+        boolean allCategories = requirement.isAllCategories();
+
+        /*
+         * 二重計上防止。
+         */
         Set<Integer> countedCourseIds = new HashSet<>();
 
         double earnedCredits = 0.0;
 
-        for (Enrollment enrollment : enrollments) {
+        for (Integer courseId : passedCourseIds) {
 
-            /*
-             * 同じ科目を複数回履修していても
-             * 単位は1回だけ計算する。
-             */
-            if (!countedCourseIds.add(enrollment.getCourseId())) {
+            if (!countedCourseIds.add(courseId)) {
+
                 continue;
             }
 
-            Integer gradeId = enrollment.getGradeId();
+            var course = courseRepository.findById(courseId);
 
-            if (gradeId == null) {
-                continue;
-            }
-
-            GradeDef grade = gradeDefRepository.findById(gradeId);
-
-            if (grade == null || !grade.isPassed()) {
+            if (course == null) {
 
                 continue;
             }
 
             /*
-             * カテゴリ指定がない場合。
+             * 「すべて」の場合。
              */
-            if (requirement.getCategoryId() == null) {
+            if (allCategories) {
 
-                var course = courseRepository.findById(enrollment.getCourseId());
-
-                if (course != null) {
-
-                    earnedCredits += course.getCredits();
-                }
+                earnedCredits += course.getCredits();
 
                 continue;
             }
 
+            Integer courseCategoryId = course.getCategoryId();
+
             /*
-             * カテゴリ指定がある場合。
+             * カテゴリ未設定の科目は、
+             * カテゴリ指定要件には含めません。
              */
-            earnedCredits += getEarnedCreditsByCategory(enrollment, requirement.getCategoryId());
+            if (courseCategoryId == null) {
+
+                continue;
+            }
+
+            if (targetCategoryIds.contains(courseCategoryId)) {
+
+                earnedCredits += course.getCredits();
+            }
         }
 
         return earnedCredits;
     }
 
     /**
-     * 指定カテゴリに属する科目の
-     * 修得単位数を取得する。
+     * 複数の対象カテゴリと、
+     * その子カテゴリをすべて取得します。
      */
-    private double getEarnedCreditsByCategory(Enrollment enrollment, Integer categoryId) throws SQLException {
-
-        var course = courseRepository.findById(enrollment.getCourseId());
-
-        if (course == null) {
-            return 0.0;
-        }
-
-        Integer courseCategoryId = course.getCategoryId();
-
-        if (courseCategoryId == null) {
-            return 0.0;
-        }
+    private Set<Integer> collectTargetCategoryIds(List<Integer> selectedCategoryIds) throws SQLException {
 
         Set<Integer> categoryIds = new HashSet<>();
 
-        collectCategoryIds(categoryId, categoryIds);
+        if (selectedCategoryIds == null || selectedCategoryIds.isEmpty()) {
 
-        if (!categoryIds.contains(courseCategoryId)) {
-            return 0.0;
+            return categoryIds;
         }
 
-        return course.getCredits();
+        for (Integer categoryId : selectedCategoryIds) {
+
+            collectCategoryIds(categoryId, categoryIds);
+        }
+
+        return categoryIds;
     }
 
     /**
      * 指定カテゴリと子カテゴリを
-     * 再帰的に取得する。
+     * 再帰的に取得します。
      */
     private void collectCategoryIds(Integer categoryId, Set<Integer> categoryIds) throws SQLException {
 
-        if (categoryId == null || categoryIds.contains(categoryId)) {
+        if (categoryId == null) {
 
             return;
         }
 
-        categoryIds.add(categoryId);
+        /*
+         * すでに探索済みなら終了します。
+         */
+        if (!categoryIds.add(categoryId)) {
+
+            return;
+        }
 
         List<CourseCategory> children = categoryRepository.findByParentId(categoryId);
 
@@ -364,7 +367,37 @@ public class GraduationRequirementService {
     }
 
     /**
-     * 残り必要単位数を取得する。
+     * 履修情報から、
+     * 一度でも合格した科目IDを取得します。
+     */
+    private Set<Integer> getPassedCourseIds(List<Enrollment> enrollments) throws SQLException {
+
+        Set<Integer> passedCourseIds = new HashSet<>();
+
+        for (Enrollment enrollment : enrollments) {
+
+            Integer gradeId = enrollment.getGradeId();
+
+            if (gradeId == null) {
+
+                continue;
+            }
+
+            GradeDef grade = gradeDefRepository.findById(gradeId);
+
+            if (grade == null || !grade.isPassed()) {
+
+                continue;
+            }
+
+            passedCourseIds.add(enrollment.getCourseId());
+        }
+
+        return passedCourseIds;
+    }
+
+    /**
+     * 残り必要単位数を取得します。
      */
     public double getRemainingCredits(GraduationRequirement requirement) throws SQLException {
 
@@ -374,7 +407,7 @@ public class GraduationRequirementService {
     }
 
     /**
-     * カリキュラムの卒業要件一覧を取得する。
+     * カリキュラムの卒業要件一覧を取得します。
      */
     public List<GraduationRequirement> getRequirements(Integer curriculumId) throws SQLException {
 
@@ -384,7 +417,23 @@ public class GraduationRequirementService {
     }
 
     /**
-     * 卒業要件の表示用データを取得する。
+     * 卒業要件の表示用データを取得します。
+     *
+     * <p>
+     * 対象カテゴリについて、
+     * </p>
+     *
+     * <pre>
+     * すべて
+     *
+     * 一般教養
+     *
+     * 数学 / 物理 / 化学
+     * </pre>
+     *
+     * <p>
+     * のような表示文字列を生成します。
+     * </p>
      */
     public List<GraduationRequirementDisplay> getRequirementDisplays(Integer curriculumId) throws SQLException {
 
@@ -396,23 +445,113 @@ public class GraduationRequirementService {
 
         for (GraduationRequirement requirement : requirements) {
 
+            /*
+             * 修得単位数。
+             */
             double earned = getEarnedCredits(requirement);
 
-            double remaining = Math.max(0.0, requirement.getRequiredCredits() - earned);
+            /*
+             * 表示する対象カテゴリ名。
+             */
+            String targetCategories = getTargetCategoriesText(requirement);
 
             /*
-             * 既存の
-             * GraduationRequirementDisplay の
-             * 3引数コンストラクタを使用する。
+             * 新しい4引数コンストラクタを使用します。
+             *
+             * name
+             * targetCategories
+             * requiredCredits
+             * earnedCredits
              */
-            displays.add(new GraduationRequirementDisplay(requirement.getName(), earned, remaining));
+            displays.add(new GraduationRequirementDisplay(requirement.getId(), requirement.getName(), targetCategories, requirement.getRequiredCredits(), earned));
         }
 
         return displays;
     }
 
     /**
-     * カリキュラムIDを検証する。
+     * 卒業要件の対象カテゴリを
+     * 画面表示用の文字列へ変換します。
+     *
+     * <p>
+     * カテゴリなし:
+     * </p>
+     *
+     * <pre>
+     * すべて
+     * </pre>
+     *
+     * <p>
+     * 1カテゴリ:
+     * </p>
+     *
+     * <pre>
+     * 一般教養
+     * </pre>
+     *
+     * <p>
+     * 複数カテゴリ:
+     * </p>
+     *
+     * <pre>
+     * 数学 / 物理 / 化学
+     * </pre>
+     */
+    private String getTargetCategoriesText(GraduationRequirement requirement) throws SQLException {
+
+        /*
+         * categoryIdsが空なら
+         * カリキュラム全体です。
+         */
+        if (requirement.isAllCategories()) {
+
+            return "すべて";
+        }
+
+        List<String> categoryNames = new ArrayList<>();
+
+        for (Integer categoryId : requirement.getCategoryIds()) {
+
+            if (categoryId == null) {
+
+                continue;
+            }
+
+            CourseCategory category = categoryRepository.findById(categoryId);
+
+            /*
+             * カテゴリが削除されているなどして
+             * 存在しない場合は表示対象外にします。
+             */
+            if (category == null) {
+
+                continue;
+            }
+
+            categoryNames.add(category.getName());
+        }
+
+        /*
+         * DB上はカテゴリ指定になっているが、
+         * 有効なカテゴリが1件も見つからなかった場合。
+         */
+        if (categoryNames.isEmpty()) {
+
+            return "カテゴリなし";
+        }
+
+        /*
+         * JavaのString.joinを使って、
+         *
+         * 数学 / 物理 / 化学
+         *
+         * のように連結します。
+         */
+        return String.join(" / ", categoryNames);
+    }
+
+    /**
+     * カリキュラムIDを検証します。
      */
     private void validateCurriculumId(Integer curriculumId) {
 

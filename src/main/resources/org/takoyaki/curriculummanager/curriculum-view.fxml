@@ -148,6 +148,10 @@
                         onAction="#addCategory"/>
 
                 <Button
+                        text="カテゴリ編集"
+                        onAction="#editCategory"/>
+
+                <Button
                         text="カテゴリ削除"
                         onAction="#deleteCategory"/>
 
@@ -172,6 +176,10 @@
                 <Button
                         text="科目追加"
                         onAction="#addCourse"/>
+
+                <Button
+                        text="科目編集"
+                        onAction="#editCourse"/>
 
                 <Button
                         text="科目削除"
@@ -200,6 +208,11 @@
                             fx:id="creditsColumn"
                             text="単位"
                             prefWidth="80"/>
+
+                    <TableColumn
+                            fx:id="requirementTypeColumn"
+                            text="区分"
+                            prefWidth="90"/>
 
                 </columns>
 

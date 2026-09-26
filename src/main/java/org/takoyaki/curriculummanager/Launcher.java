@@ -1,9 +1,16 @@
 package org.takoyaki.curriculummanager;
 
-import javafx.application.Application;
+/**
+ * JARファイルからアプリケーションを
+ * 起動するためのエントリーポイントです。
+ */
+public final class Launcher {
 
-public class Launcher {
+    private Launcher() {
+    }
+
     public static void main(String[] args) {
-        Application.launch(HelloApplication.class, args);
+
+        HelloApplication.main(args);
     }
 }

@@ -222,9 +222,15 @@ public class EnrollmentController {
 
         List<Curriculum> curricula = curriculumService.getCurricula(department.getId());
 
-        curriculumComboBox.setItems(FXCollections.observableArrayList(curricula));
+        var items = FXCollections.<Curriculum>observableArrayList();
 
-        if (!curricula.isEmpty()) {
+        items.add(Curriculum.allOption());
+
+        items.addAll(curricula);
+
+        curriculumComboBox.setItems(items);
+
+        if (!items.isEmpty()) {
 
             curriculumComboBox.getSelectionModel().selectFirst();
 
@@ -254,6 +260,11 @@ public class EnrollmentController {
             return;
         }
 
+        if (curriculum.isAllOption()) {
+
+            return;
+        }
+
         /*
          * CurriculumCourseServiceを利用して、
          * 現在のカリキュラムに登録されている
@@ -272,6 +283,23 @@ public class EnrollmentController {
         if (curriculum == null || curriculum.getId() == null) {
 
             enrollmentTable.getItems().clear();
+
+            return;
+        }
+
+        if (curriculum.isAllOption()) {
+
+            List<EnrollmentDisplay> displays = new java.util.ArrayList<>();
+
+            for (Curriculum item : curriculumComboBox.getItems()) {
+
+                if (item != null && !item.isAllOption()) {
+
+                    displays.addAll(enrollmentService.getEnrollmentDisplaysByCurriculum(item.getId()));
+                }
+            }
+
+            enrollmentTable.setItems(FXCollections.observableArrayList(displays));
 
             return;
         }
@@ -295,9 +323,9 @@ public class EnrollmentController {
 
         String semester = semesterComboBox.getValue();
 
-        if (curriculum == null) {
+        if (curriculum == null || curriculum.isAllOption()) {
 
-            showError("カリキュラムを選択してください。");
+            showError("履修を登録するカリキュラムを選択してください。");
 
             return;
         }

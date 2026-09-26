@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -15,54 +16,70 @@
         xmlns:fx="http://javafx.com/fxml"
         fx:controller="org.takoyaki.curriculummanager.controller.GraduationController">
 
+    <!--
+        上部:
+        学部・カリキュラム選択と操作ボタン
+    -->
     <top>
-        <VBox spacing="10">
+
+        <VBox spacing="12">
 
             <padding>
                 <Insets
                         top="15"
                         right="15"
-                        bottom="15"
+                        bottom="10"
                         left="15"/>
             </padding>
 
             <Label
                     text="卒業要件"
-                    style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+                    style="
+                        -fx-font-size: 22px;
+                        -fx-font-weight: bold;
+                    "/>
 
-            <!--
-                学部とカリキュラムを選択する。
-                学部を変更すると、その学部に属する
-                カリキュラムだけが表示される。
-            -->
-            <HBox spacing="10">
+            <HBox
+                    spacing="10"
+                    alignment="CENTER_LEFT">
 
                 <Label
                         text="学部"/>
 
                 <ComboBox
                         fx:id="departmentComboBox"
-                        prefWidth="200"/>
+                        prefWidth="200"
+                        promptText="学部を選択"/>
 
                 <Label
                         text="カリキュラム"/>
 
                 <ComboBox
                         fx:id="curriculumComboBox"
-                        prefWidth="250"/>
+                        prefWidth="250"
+                        promptText="カリキュラムを選択"/>
 
                 <!--
+                    選択中のカリキュラムへ
                     卒業要件を追加する。
-                    現在選択されているカリキュラムに対して
-                    卒業要件を登録する。
+
+                    追加画面では、
+                    ・すべて
+                    ・単一カテゴリ
+                    ・複数カテゴリ
+                    を指定できる。
                 -->
                 <Button
                         text="卒業要件追加"
                         onAction="#addRequirement"/>
 
+                <Button
+                        text="卒業要件編集"
+                        onAction="#editRequirement"/>
+
                 <!--
-                    現在選択されているカリキュラムの
-                    卒業要件を再読み込みする。
+                    現在表示中の情報を
+                    データベースから再読み込みする。
                 -->
                 <Button
                         text="更新"
@@ -70,111 +87,181 @@
 
             </HBox>
 
+            <Separator/>
+
         </VBox>
+
     </top>
 
+    <!--
+        中央:
+        卒業判定、卒業要件一覧、必修科目一覧
+    -->
     <center>
+
         <VBox spacing="15">
 
             <padding>
                 <Insets
-                        top="15"
+                        top="10"
                         right="15"
                         bottom="15"
                         left="15"/>
             </padding>
 
-            <!-- 卒業判定と総修得単位 -->
-            <HBox spacing="30">
+            <!--
+                卒業判定と修得単位表示
+            -->
+            <HBox
+                    spacing="30"
+                    alignment="CENTER_LEFT">
 
                 <Label
                         fx:id="graduationStatusLabel"
                         text="カリキュラム未選択"
-                        style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                        style="
+                            -fx-font-size: 18px;
+                            -fx-font-weight: bold;
+                        "/>
 
                 <Label
                         fx:id="totalCreditsLabel"
                         text="修得単位: 0.0"
-                        style="-fx-font-size: 18px;"/>
+                        style="
+                            -fx-font-size: 18px;
+                        "/>
 
             </HBox>
 
-            <!-- 卒業要件 -->
-            <Label
-                    text="卒業要件"
-                    style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+            <!--
+                卒業要件一覧
+            -->
+            <VBox spacing="8">
 
-            <TableView
-                    fx:id="requirementTable"
-                    prefHeight="220">
+                <Label
+                        text="卒業要件"
+                        style="
+                            -fx-font-size: 16px;
+                            -fx-font-weight: bold;
+                        "/>
 
-                <columns>
+                <TableView
+                        fx:id="requirementTable"
+                        prefHeight="240"
+                        VBox.vgrow="ALWAYS">
 
-                    <TableColumn
-                            fx:id="nameColumn"
-                            text="要件"
-                            prefWidth="230"/>
+                    <columns>
 
-                    <TableColumn
-                            fx:id="requiredColumn"
-                            text="必要単位"
-                            prefWidth="100"/>
+                        <!--
+                            卒業要件名
 
-                    <TableColumn
-                            fx:id="earnedColumn"
-                            text="修得単位"
-                            prefWidth="100"/>
+                            例:
+                            卒業必要単位
+                            一般教養
+                            基礎科学分野
+                        -->
+                        <TableColumn
+                                fx:id="nameColumn"
+                                text="要件"
+                                prefWidth="220"/>
 
-                    <TableColumn
-                            fx:id="remainingColumn"
-                            text="残り"
-                            prefWidth="100"/>
+                        <!--
+                            対象カテゴリ
 
-                    <TableColumn
-                            fx:id="statusColumn"
-                            text="状態"
-                            prefWidth="100"/>
+                            例:
+                            すべて
+                            一般教養
+                            数学 / 物理 / 化学
+                        -->
+                        <TableColumn
+                                fx:id="targetCategoriesColumn"
+                                text="対象"
+                                prefWidth="260"/>
 
-                </columns>
+                        <TableColumn
+                                fx:id="requiredColumn"
+                                text="必要単位"
+                                prefWidth="100"/>
 
-            </TableView>
+                        <TableColumn
+                                fx:id="earnedColumn"
+                                text="修得単位"
+                                prefWidth="100"/>
 
-            <!-- 必修科目 -->
-            <Label
-                    text="必修科目"
-                    style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <TableColumn
+                                fx:id="remainingColumn"
+                                text="残り"
+                                prefWidth="90"/>
 
-            <TableView
-                    fx:id="mandatoryCourseTable"
+                        <TableColumn
+                                fx:id="statusColumn"
+                                text="状態"
+                                prefWidth="90"/>
+
+                    </columns>
+
+                    <placeholder>
+                        <Label
+                                text="卒業要件が登録されていません。"/>
+                    </placeholder>
+
+                </TableView>
+
+            </VBox>
+
+            <!--
+                必修科目一覧
+            -->
+            <VBox
+                    spacing="8"
                     VBox.vgrow="ALWAYS">
 
-                <columns>
+                <Label
+                        text="必修科目"
+                        style="
+                            -fx-font-size: 16px;
+                            -fx-font-weight: bold;
+                        "/>
 
-                    <TableColumn
-                            fx:id="mandatoryCourseCodeColumn"
-                            text="科目コード"
-                            prefWidth="140"/>
+                <TableView
+                        fx:id="mandatoryCourseTable"
+                        VBox.vgrow="ALWAYS">
 
-                    <TableColumn
-                            fx:id="mandatoryCourseNameColumn"
-                            text="科目名"
-                            prefWidth="350"/>
+                    <columns>
 
-                    <TableColumn
-                            fx:id="mandatoryCreditsColumn"
-                            text="単位"
-                            prefWidth="80"/>
+                        <TableColumn
+                                fx:id="mandatoryCourseCodeColumn"
+                                text="科目コード"
+                                prefWidth="140"/>
 
-                    <TableColumn
-                            fx:id="mandatoryStatusColumn"
-                            text="修得状況"
-                            prefWidth="120"/>
+                        <TableColumn
+                                fx:id="mandatoryCourseNameColumn"
+                                text="科目名"
+                                prefWidth="350"/>
 
-                </columns>
+                        <TableColumn
+                                fx:id="mandatoryCreditsColumn"
+                                text="単位"
+                                prefWidth="80"/>
 
-            </TableView>
+                        <TableColumn
+                                fx:id="mandatoryStatusColumn"
+                                text="修得状況"
+                                prefWidth="120"/>
+
+                    </columns>
+
+                    <placeholder>
+                        <Label
+                                text="必修科目が登録されていません。"/>
+                    </placeholder>
+
+                </TableView>
+
+            </VBox>
 
         </VBox>
+
     </center>
 
 </BorderPane>

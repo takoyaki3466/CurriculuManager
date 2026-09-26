@@ -15,6 +15,7 @@ public class GraduationRequirementsTable {
      * そのカテゴリーの必要単位数。
      */
     public static void createGraduationRequirementsTable(Connection connection) throws SQLException {
+        GraduationRequirementCategoriesTable.createGraduationRequirementCategoriesTable(connection);
 
         try (Statement statement = connection.createStatement()) {
 

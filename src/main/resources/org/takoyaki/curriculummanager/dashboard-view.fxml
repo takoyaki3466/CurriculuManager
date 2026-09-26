@@ -4,6 +4,8 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -26,46 +28,50 @@
             text="ダッシュボード"
             style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
 
+    <!-- 全年度を対象にした全体集計 -->
+    <HBox spacing="55" alignment="CENTER_LEFT">
+
+        <VBox spacing="5">
+            <Label text="全年度 合計GPA" style="-fx-font-size: 14px;"/>
+            <Label fx:id="gpaLabel" text="0.00" style="-fx-font-size: 30px; -fx-font-weight: bold;"/>
+        </VBox>
+
+        <VBox spacing="5">
+            <Label text="全年度 合計修得単位" style="-fx-font-size: 14px;"/>
+            <Label fx:id="earnedCreditsLabel" text="0.0 単位" style="-fx-font-size: 30px; -fx-font-weight: bold;"/>
+        </VBox>
+
+        <VBox spacing="5">
+            <Label text="現在の卒業判定" style="-fx-font-size: 14px;"/>
+            <Label fx:id="graduationPossibleLabel" text="卒業不可" style="-fx-font-size: 30px; -fx-font-weight: bold;"/>
+        </VBox>
+
+        <Button text="情報を更新" onAction="#refresh" prefWidth="130"/>
+
+    </HBox>
+
     <!-- ダッシュボード本体 -->
     <HBox
             spacing="40"
             VBox.vgrow="ALWAYS">
 
-        <!-- 左側：現在の情報 -->
+        <!-- 左側：年度別の情報 -->
         <VBox
-                spacing="25"
-                prefWidth="300">
+                spacing="10"
+                prefWidth="390">
 
-            <VBox spacing="5">
+            <Label text="年度別 GPA・修得単位" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
 
-                <Label
-                        text="GPA"
-                        style="-fx-font-size: 14px;"/>
-
-                <Label
-                        fx:id="gpaLabel"
-                        text="0.00"
-                        style="-fx-font-size: 28px; -fx-font-weight: bold;"/>
-
-            </VBox>
-
-            <VBox spacing="5">
-
-                <Label
-                        text="修得単位"
-                        style="-fx-font-size: 14px;"/>
-
-                <Label
-                        fx:id="earnedCreditsLabel"
-                        text="0.0 単位"
-                        style="-fx-font-size: 28px; -fx-font-weight: bold;"/>
-
-            </VBox>
-
-            <Button
-                    text="情報を更新"
-                    onAction="#refresh"
-                    prefWidth="150"/>
+            <TableView fx:id="yearlySummaryTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="yearColumn" text="年度" prefWidth="100"/>
+                    <TableColumn fx:id="yearlyGpaColumn" text="GPA" prefWidth="120"/>
+                    <TableColumn fx:id="yearlyCreditsColumn" text="修得単位" prefWidth="150"/>
+                </columns>
+                <placeholder>
+                    <Label text="年度が登録された履修はありません。"/>
+                </placeholder>
+            </TableView>
 
         </VBox>
 

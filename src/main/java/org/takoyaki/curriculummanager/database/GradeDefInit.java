@@ -13,7 +13,7 @@ public final class GradeDefInit {
     private GradeDefInit() {
     }
 
-    public static void initialize() throws SQLException {
+    public static void initialize() {
 
         GradeDefRepository repository = new GradeDefRepository();
 
@@ -28,11 +28,15 @@ public final class GradeDefInit {
         addIfMissing(repository, new GradeDef("P", null, true, false));
     }
 
-    private static void addIfMissing(GradeDefRepository repository, GradeDef grade) throws SQLException {
+    private static void addIfMissing(GradeDefRepository repository, GradeDef grade) {
+        try {
 
-        if (repository.findBySymbol(grade.getSymbol()) == null) {
+            if (repository.findBySymbol(grade.getSymbol()) == null) {
+                repository.save(grade);
+            }
 
-            repository.save(grade);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

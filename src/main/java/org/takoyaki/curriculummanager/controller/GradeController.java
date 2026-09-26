@@ -231,9 +231,15 @@ public class GradeController {
 
         List<Curriculum> curricula = curriculumService.getCurricula(department.getId());
 
-        curriculumComboBox.setItems(FXCollections.observableArrayList(curricula));
+        var items = FXCollections.<Curriculum>observableArrayList();
 
-        if (!curricula.isEmpty()) {
+        items.add(Curriculum.allOption());
+
+        items.addAll(curricula);
+
+        curriculumComboBox.setItems(items);
+
+        if (!items.isEmpty()) {
 
             curriculumComboBox.getSelectionModel().selectFirst();
         }
@@ -248,8 +254,31 @@ public class GradeController {
 
         if (curriculum == null || curriculum.getId() == null) {
 
+            gradeTable.setEditable(false);
+
             return;
         }
+
+        if (curriculum.isAllOption()) {
+
+            List<EnrollmentDisplay> displays = new java.util.ArrayList<>();
+
+            for (Curriculum item : curriculumComboBox.getItems()) {
+
+                if (item != null && !item.isAllOption()) {
+
+                    displays.addAll(gradeService.getEnrollmentDisplaysByCurriculum(item.getId()));
+                }
+            }
+
+            gradeTable.setItems(FXCollections.observableArrayList(displays));
+
+            gradeTable.setEditable(false);
+
+            return;
+        }
+
+        gradeTable.setEditable(true);
 
         List<EnrollmentDisplay> displays = gradeService.getEnrollmentDisplaysByCurriculum(curriculum.getId());
 
@@ -263,7 +292,7 @@ public class GradeController {
 
         Curriculum curriculum = curriculumComboBox.getValue();
 
-        if (curriculum == null || curriculum.getId() == null) {
+        if (curriculum == null || curriculum.getId() == null || curriculum.isAllOption()) {
 
             showError("カリキュラムが選択されていません。");
 

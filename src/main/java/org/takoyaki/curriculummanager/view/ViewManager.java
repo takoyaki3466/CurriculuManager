@@ -87,16 +87,4 @@ public class ViewManager {
         show("graduation-view.fxml");
     }
 
-    /**
-     * カリキュラム科目設定画面を表示します。
-     *
-     * <p>
-     * カリキュラムにどの科目を登録するか、
-     * また、その科目を「必修」「選択」の
-     * どちらとして扱うかを設定する画面です。
-     * </p>
-     */
-    public void showCurriculumCourse() {
-        show("curriculum-course-view.fxml");
-    }
 }

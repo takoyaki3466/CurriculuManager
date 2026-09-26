@@ -77,17 +77,4 @@ public class MainController {
         viewManager.showGraduation();
     }
 
-    /**
-     * カリキュラム科目設定画面を表示する。
-     *
-     * <p>
-     * カリキュラムに登録する科目と、
-     * その科目の「必修」「選択」を設定します。
-     * </p>
-     */
-    @FXML
-    private void openCurriculumCourse() {
-
-        viewManager.showCurriculumCourse();
-    }
 }

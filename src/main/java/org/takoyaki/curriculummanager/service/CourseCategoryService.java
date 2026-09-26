@@ -48,6 +48,21 @@ public class CourseCategoryService {
     }
 
     /**
+     * すべてのカリキュラムのカテゴリーを取得します。
+     */
+    public List<CourseCategory> getAllCategories() {
+
+        try {
+
+            return repository.findAll();
+
+        } catch (Exception e) {
+
+            throw new RuntimeException("カテゴリー一覧の取得に失敗しました。", e);
+        }
+    }
+
+    /**
      * カテゴリーを新規登録します。
      *
      * @param category 登録するカテゴリー

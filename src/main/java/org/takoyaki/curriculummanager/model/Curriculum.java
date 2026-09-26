@@ -9,6 +9,8 @@ package org.takoyaki.curriculummanager.model;
  */
 public class Curriculum {
 
+    private static final int ALL_OPTION_ID = -1;
+
     /**
      * カリキュラムID。
      */
@@ -55,6 +57,22 @@ public class Curriculum {
         this.majorId = majorId;
         this.name = name;
         this.startYear = startYear;
+    }
+
+    /**
+     * カリキュラム選択リスト用の「すべて表示」を生成する。
+     */
+    public static Curriculum allOption() {
+
+        return new Curriculum(ALL_OPTION_ID, null, "すべて表示", 0);
+    }
+
+    /**
+     * この項目が「すべて表示」か判定する。
+     */
+    public boolean isAllOption() {
+
+        return Integer.valueOf(ALL_OPTION_ID).equals(id);
     }
 
     public Integer getId() {

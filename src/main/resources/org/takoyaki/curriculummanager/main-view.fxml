@@ -74,15 +74,6 @@
                         onAction="#openCurriculum"
                         maxWidth="Infinity"/>
 
-                <!--
-                    カリキュラムに登録する科目と、
-                    その科目の必修・選択を設定する画面。
-                -->
-                <Button
-                        text="カリキュラム科目設定"
-                        onAction="#openCurriculumCourse"
-                        maxWidth="Infinity"/>
-
                 <Button
                         text="卒業要件"
                         onAction="#openGraduation"

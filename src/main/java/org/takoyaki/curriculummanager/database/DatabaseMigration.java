@@ -1,5 +1,7 @@
 package org.takoyaki.curriculummanager.database;
 
+import org.takoyaki.curriculummanager.database.tables.GraduationRequirementCategoriesTable;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,7 +20,7 @@ public final class DatabaseMigration {
     /**
      * 現在のデータベース構造のバージョン。
      */
-    private static final int CURRENT_VERSION = 4;
+    private static final int CURRENT_VERSION = 5;
 
     private DatabaseMigration() {
     }
@@ -46,7 +48,7 @@ public final class DatabaseMigration {
              *
              * そのため、最新版のスキーマがすでに存在する
              * version=0のデータベースは、
-             * そのまま最新版(version=4)として扱います。
+             * そのまま最新版として扱います。
              */
             if (version == 0 && isCurrentSchema(connection)) {
 
@@ -119,6 +121,27 @@ public final class DatabaseMigration {
                 setDatabaseVersion(connection, version);
             }
 
+            /*
+             * バージョン4 → 5
+             *
+             * 卒業要件と科目カテゴリを
+             * 多対多で関連付けられるようにします。
+             *
+             * graduation_requirement_categories
+             *
+             * テーブルを追加し、
+             * 既存の graduation_requirements.category_id
+             * の内容を新しい中間テーブルへ移行します。
+             */
+            if (version < 5) {
+
+                migrateV4ToV5(connection);
+
+                version = 5;
+
+                setDatabaseVersion(connection, version);
+            }
+
         } catch (SQLException e) {
 
             throw new RuntimeException("データベースのマイグレーションに失敗しました。", e);
@@ -142,6 +165,7 @@ public final class DatabaseMigration {
      * <ul>
      *     <li>curriculaにmajor_idが存在する</li>
      *     <li>enrollmentsにcurriculum_idが存在する</li>
+     *     <li>graduation_requirement_categoriesが存在する</li>
      * </ul>
      *
      * @param connection データベース接続
@@ -153,7 +177,33 @@ public final class DatabaseMigration {
 
         boolean enrollmentsHasCurriculumId = hasColumn(connection, "enrollments", "curriculum_id");
 
-        return curriculaHasMajorId && enrollmentsHasCurriculumId;
+        boolean hasRequirementCategoriesTable = hasTable(connection, "graduation_requirement_categories");
+
+        return curriculaHasMajorId && enrollmentsHasCurriculumId && hasRequirementCategoriesTable;
+    }
+
+    /**
+     * 指定されたテーブルが存在するか確認します。
+     *
+     * @param connection データベース接続
+     * @param tableName  テーブル名
+     * @return テーブルが存在すればtrue
+     */
+    private static boolean hasTable(Connection connection, String tableName) throws SQLException {
+
+        String sql = """
+                SELECT name
+                FROM sqlite_master
+                WHERE type = 'table'
+                  AND name = '%s'
+                """.formatted(tableName);
+
+        try (Statement statement = connection.createStatement();
+
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
+            return resultSet.next();
+        }
     }
 
     /**
@@ -332,7 +382,6 @@ public final class DatabaseMigration {
         }
     }
 
-
     /**
      * バージョン2から3へ移行します。
      *
@@ -470,6 +519,100 @@ public final class DatabaseMigration {
             statement.execute("PRAGMA foreign_keys = ON");
 
             statement.execute("PRAGMA foreign_key_check");
+
+            connection.commit();
+
+        } catch (SQLException e) {
+
+            connection.rollback();
+
+            throw e;
+
+        } finally {
+
+            connection.setAutoCommit(true);
+        }
+    }
+
+    /**
+     * バージョン4から5へ移行します。
+     *
+     * <p>
+     * 1つの卒業要件に複数の科目カテゴリを
+     * 設定できるように、
+     * graduation_requirement_categories
+     * 中間テーブルを追加します。
+     * </p>
+     *
+     * <p>
+     * また、既存の
+     * graduation_requirements.category_id
+     * に保存されているカテゴリ設定を
+     * 新しい中間テーブルへ移行します。
+     * </p>
+     *
+     * <p>
+     * category_id が NULL の卒業要件は
+     * 「すべて」を対象とする要件なので、
+     * 中間テーブルには登録しません。
+     * </p>
+     */
+    private static void migrateV4ToV5(Connection connection) throws SQLException {
+
+        connection.setAutoCommit(false);
+
+        try {
+
+            /*
+             * 中間テーブルを作成します。
+             *
+             * CREATE TABLE IF NOT EXISTS のため、
+             * DatabaseInitですでに作成されていても
+             * 問題ありません。
+             */
+            GraduationRequirementCategoriesTable.createGraduationRequirementCategoriesTable(connection);
+
+            /*
+             * 既存の単一カテゴリ設定を
+             * 新しい中間テーブルへ移します。
+             *
+             * INSERT OR IGNORE を使用することで、
+             * DatabaseInitや途中の実行などによって
+             * すでに同じ関連が存在していても
+             * 重複エラーになりません。
+             */
+            try (Statement statement = connection.createStatement()) {
+
+                statement.execute("""
+                        INSERT OR IGNORE INTO
+                        graduation_requirement_categories (
+                            requirement_id,
+                            category_id
+                        )
+                        SELECT
+                            id,
+                            category_id
+                        FROM graduation_requirements
+                        WHERE category_id IS NOT NULL
+                        """);
+
+                /*
+                 * 外部キーに問題がないか確認します。
+                 */
+                try (ResultSet resultSet = statement.executeQuery("PRAGMA foreign_key_check")) {
+
+                    if (resultSet.next()) {
+
+                        String table = resultSet.getString("table");
+
+                        long rowId = resultSet.getLong("rowid");
+
+                        String parent = resultSet.getString("parent");
+
+                        throw new SQLException("外部キー整合性チェックに失敗しました。" + " table=" + table + ", rowid=" + rowId + ", parent=" + parent);
+                    }
+                }
+            }
 
             connection.commit();
 
