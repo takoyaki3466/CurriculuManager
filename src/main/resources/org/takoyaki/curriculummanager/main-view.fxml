@@ -20,25 +20,26 @@
             <padding>
                 <Insets top="12" right="14" bottom="12" left="14"/>
             </padding>
-            <Label text="履修管理くん" styleClass="app-title"/>
-            <Label text="履修・成績・卒業要件管理" styleClass="secondary-label"/>
+            <Label text="%app.title" styleClass="app-title"/>
+            <Label text="%app.subtitle" styleClass="secondary-label"/>
         </VBox>
     </top>
 
     <center>
         <HBox>
-            <!-- 小画面向けにサイドバーを少し細くする -->
             <VBox spacing="6" prefWidth="150" minWidth="135" maxWidth="165" styleClass="sidebar">
                 <padding>
                     <Insets top="12" right="8" bottom="12" left="8"/>
                 </padding>
 
-                <Label text="メニュー" styleClass="section-title"/>
-                <Button text="ダッシュボード" onAction="#openDashboard" maxWidth="Infinity" styleClass="nav-button"/>
-                <Button text="履修科目" onAction="#openEnrollment" maxWidth="Infinity" styleClass="nav-button"/>
-                <Button text="成績" onAction="#openGrade" maxWidth="Infinity" styleClass="nav-button"/>
-                <Button text="カリキュラム" onAction="#openCurriculum" maxWidth="Infinity" styleClass="nav-button"/>
-                <Button text="卒業要件" onAction="#openGraduation" maxWidth="Infinity" styleClass="nav-button"/>
+                <Label text="%nav.menu" styleClass="section-title"/>
+                <Button text="%nav.dashboard" onAction="#openDashboard" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="%nav.enrollment" onAction="#openEnrollment" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="%nav.grade" onAction="#openGrade" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="%nav.curriculum" onAction="#openCurriculum" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="%nav.graduation" onAction="#openGraduation" maxWidth="Infinity" styleClass="nav-button"/>
+                <Button text="%nav.databaseTransfer" onAction="#openDatabaseTransfer" maxWidth="Infinity" wrapText="true" styleClass="nav-button"/>
+                <Button text="%nav.qa" onAction="#openQa" maxWidth="Infinity" styleClass="nav-button"/>
             </VBox>
 
             <StackPane fx:id="contentPane" minWidth="0" HBox.hgrow="ALWAYS" styleClass="content-area"/>

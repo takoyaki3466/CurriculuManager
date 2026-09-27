@@ -1,11 +1,16 @@
 package org.takoyaki.curriculummanager.service;
 
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Department;
 import org.takoyaki.curriculummanager.repository.DepartmentRepository;
 import org.takoyaki.curriculummanager.service.abstracts.AbstractRepositoryService;
 
 import java.sql.SQLException;
 import java.util.List;
+
+import static org.takoyaki.curriculummanager.util.ValidationUtils.requireEntity;
+import static org.takoyaki.curriculummanager.util.ValidationUtils.requireId;
+import static org.takoyaki.curriculummanager.util.ValidationUtils.requireText;
 
 public class DepartmentService extends AbstractRepositoryService<Department> {
     public DepartmentService() {
@@ -21,7 +26,7 @@ public class DepartmentService extends AbstractRepositoryService<Department> {
     }
 
     public Department getDepartment(Integer id) throws SQLException {
-        requireId(id, "学部が指定されていません。");
+        requireId(id, I18n.text("validation.department.required"));
 
         return repository.findById(id);
     }
@@ -32,10 +37,10 @@ public class DepartmentService extends AbstractRepositoryService<Department> {
     }
 
     public void updateDepartment(Department department) throws SQLException {
-        requireEntity(department, "更新する学部が指定されていません。");
+        requireEntity(department, I18n.text("validation.department.updateRequired"));
 
         if (department.getId() == null) {
-            throw new IllegalArgumentException("更新する学部が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.department.updateRequired"));
         }
 
         validateDepartment(department);
@@ -43,13 +48,13 @@ public class DepartmentService extends AbstractRepositoryService<Department> {
     }
 
     public void deleteDepartment(Integer id) throws SQLException {
-        requireId(id, "削除する学部が指定されていません。");
+        requireId(id, I18n.text("validation.department.deleteRequired"));
 
         repository.deleteById(id);
     }
 
     private void validateDepartment(Department department) {
-        requireEntity(department, "学部が指定されていません。");
-        department.setName(requireText(department.getName(), "学部名を入力してください。"));
+        requireEntity(department, I18n.text("validation.department.required"));
+        department.setName(requireText(department.getName(), I18n.text("validation.department.name")));
     }
 }

@@ -25,17 +25,17 @@
             </padding>
 
             <FlowPane styleClass="responsive-flow" prefWrapLength="760">
-                <Label text="成績" styleClass="title-label"/>
-                <Button text="更新" onAction="#refresh" styleClass="secondary-button"/>
+                <Label text="%nav.grade" styleClass="title-label"/>
+                <Button text="%common.refresh" onAction="#refresh" styleClass="secondary-button"/>
             </FlowPane>
 
             <VBox spacing="9" styleClass="toolbar-card">
-                <Label fx:id="academicContextLabel" text="学部・学科未設定" styleClass="context-label"/>
+                <Label fx:id="academicContextLabel" text="%common.notConfigured" styleClass="context-label"/>
 
                 <FlowPane styleClass="responsive-flow" prefWrapLength="760">
                     <HBox styleClass="field-group">
-                        <Label text="カリキュラム"/>
-                        <ComboBox fx:id="curriculumComboBox" styleClass="wide-combo" promptText="カリキュラムを選択"/>
+                        <Label text="%common.curriculum"/>
+                        <ComboBox fx:id="curriculumComboBox" styleClass="wide-combo" promptText="%common.curriculum.select"/>
                     </HBox>
                 </FlowPane>
             </VBox>
@@ -50,12 +50,12 @@
 
             <TableView fx:id="gradeTable" editable="true" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="yearColumn" text="年度" minWidth="70" prefWidth="80"/>
-                    <TableColumn fx:id="semesterColumn" text="学期" minWidth="80" prefWidth="90"/>
-                    <TableColumn fx:id="courseCodeColumn" text="科目コード" minWidth="105" prefWidth="120"/>
-                    <TableColumn fx:id="courseNameColumn" text="科目名" minWidth="220" prefWidth="300"/>
-                    <TableColumn fx:id="creditsColumn" text="単位" minWidth="70" prefWidth="80"/>
-                    <TableColumn fx:id="gradeColumn" text="成績" minWidth="90" prefWidth="110"/>
+                    <TableColumn fx:id="yearColumn" text="%common.year" minWidth="70" prefWidth="80"/>
+                    <TableColumn fx:id="semesterColumn" text="%common.semester" minWidth="80" prefWidth="90"/>
+                    <TableColumn fx:id="courseCodeColumn" text="%common.course.code" minWidth="105" prefWidth="120"/>
+                    <TableColumn fx:id="courseNameColumn" text="%common.course.name" minWidth="220" prefWidth="300"/>
+                    <TableColumn fx:id="creditsColumn" text="%common.credits" minWidth="70" prefWidth="80"/>
+                    <TableColumn fx:id="gradeColumn" text="%common.grade" minWidth="90" prefWidth="110"/>
                 </columns>
             </TableView>
         </VBox>

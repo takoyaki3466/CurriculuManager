@@ -1,5 +1,7 @@
 package org.takoyaki.curriculummanager.database;
 
+import org.takoyaki.curriculummanager.i18n.I18n;
+
 import org.takoyaki.curriculummanager.database.tables.GraduationRequirementCategoriesTable;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -51,7 +53,7 @@ public final class DatabaseMigration {
                 setDatabaseVersion(connection, version);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("データベースのマイグレーションに失敗しました。", e);
+            throw new RuntimeException(I18n.raw("database.error.migration"), e);
         }
     }
 
@@ -287,7 +289,7 @@ public final class DatabaseMigration {
                         String table = resultSet.getString("table");
                         long rowId = resultSet.getLong("rowid");
                         String parent = resultSet.getString("parent");
-                        throw new SQLException("外部キー整合性チェックに失敗しました。" + " table=" + table + ", rowid=" + rowId + ", parent=" + parent);
+                        throw new SQLException(I18n.raw("database.error.foreignKey", table, rowId, parent));
                     }
                 }
             }

@@ -1,6 +1,7 @@
 package org.takoyaki.curriculummanager.repository;
 
 import org.takoyaki.curriculummanager.database.DatabaseManager;
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.repository.interfaces.SettingRepository;
 
 import java.sql.Connection;
@@ -21,7 +22,7 @@ public class AppSettingRepository implements SettingRepository {
                 return resultSet.next() ? resultSet.getString(1) : null;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("設定の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("settings.error.load"), e);
         }
     }
 
@@ -39,7 +40,7 @@ public class AppSettingRepository implements SettingRepository {
             statement.setString(2, value);
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("設定の保存に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("settings.error.save"), e);
         }
     }
 }

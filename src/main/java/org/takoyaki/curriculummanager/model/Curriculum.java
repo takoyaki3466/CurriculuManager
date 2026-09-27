@@ -1,5 +1,7 @@
 package org.takoyaki.curriculummanager.model;
 
+import org.takoyaki.curriculummanager.i18n.I18n;
+
 public class Curriculum {
     private static final int ALL_OPTION_ID = -1;
     private Integer id;
@@ -21,7 +23,7 @@ public class Curriculum {
     }
 
     public static Curriculum allOption() {
-        return new Curriculum(ALL_OPTION_ID, null, "すべて表示", 0);
+        return new Curriculum(ALL_OPTION_ID, null, I18n.raw("common.selectAll"), 0);
     }
 
     public boolean isAllOption() {

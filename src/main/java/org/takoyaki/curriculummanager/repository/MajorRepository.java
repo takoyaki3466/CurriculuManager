@@ -1,6 +1,7 @@
 package org.takoyaki.curriculummanager.repository;
 
 import org.takoyaki.curriculummanager.database.DatabaseManager;
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Major;
 import org.takoyaki.curriculummanager.repository.abstracts.AbstractJdbcRepository;
 
@@ -33,7 +34,7 @@ public class MajorRepository extends AbstractJdbcRepository<Major> {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("学科の登録に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.major.save"), e);
         }
 
         return major;
@@ -59,7 +60,7 @@ public class MajorRepository extends AbstractJdbcRepository<Major> {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("学科の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.major.load"), e);
         }
 
         return null;
@@ -83,7 +84,7 @@ public class MajorRepository extends AbstractJdbcRepository<Major> {
                 majors.add(mapRow(resultSet));
             }
         } catch (SQLException e) {
-            throw new RuntimeException("学科一覧の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.major.list"), e);
         }
 
         return majors;
@@ -111,7 +112,7 @@ public class MajorRepository extends AbstractJdbcRepository<Major> {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("学部に所属する学科の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.major.listByDepartment"), e);
         }
 
         return majors;
@@ -133,7 +134,7 @@ public class MajorRepository extends AbstractJdbcRepository<Major> {
             statement.setInt(3, major.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("学科の更新に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.major.update"), e);
         }
     }
 
@@ -148,7 +149,7 @@ public class MajorRepository extends AbstractJdbcRepository<Major> {
             statement.setInt(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("学科の削除に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.major.delete"), e);
         }
     }
 

@@ -9,27 +9,4 @@ public abstract class AbstractRepositoryService<T> {
         this.repository = repository;
     }
 
-    protected T requireEntity(T entity, String message) {
-        if (entity == null) {
-            throw new IllegalArgumentException(message);
-        }
-
-        return entity;
-    }
-
-    protected Integer requireId(Integer id, String message) {
-        if (id == null) {
-            throw new IllegalArgumentException(message);
-        }
-
-        return id;
-    }
-
-    protected String requireText(String value, String message) {
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(message);
-        }
-
-        return value.trim();
-    }
 }

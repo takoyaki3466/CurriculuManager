@@ -1,10 +1,15 @@
 package org.takoyaki.curriculummanager.service;
 
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Course;
 import org.takoyaki.curriculummanager.repository.CourseRepository;
 import org.takoyaki.curriculummanager.service.abstracts.AbstractRepositoryService;
 
 import java.util.List;
+
+import static org.takoyaki.curriculummanager.util.ValidationUtils.requireEntity;
+import static org.takoyaki.curriculummanager.util.ValidationUtils.requireId;
+import static org.takoyaki.curriculummanager.util.ValidationUtils.requireText;
 
 public class CourseService extends AbstractRepositoryService<Course> {
     private final CourseRepository courseRepository;
@@ -22,27 +27,27 @@ public class CourseService extends AbstractRepositoryService<Course> {
         try {
             return courseRepository.findAll();
         } catch (Exception e) {
-            throw new RuntimeException("科目一覧の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.text("service.course.list"), e);
         }
     }
 
     public Course getCourse(Integer id) {
-        requireId(id, "科目が指定されていません。");
+        requireId(id, I18n.text("validation.course.required"));
 
         try {
             return courseRepository.findById(id);
         } catch (Exception e) {
-            throw new RuntimeException("科目の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.text("service.course.load"), e);
         }
     }
 
     public List<Course> getCoursesByCategoryId(Integer categoryId) {
-        requireId(categoryId, "カテゴリーが指定されていません。");
+        requireId(categoryId, I18n.text("validation.category.labelRequired"));
 
         try {
             return courseRepository.findByCategoryId(categoryId);
         } catch (Exception e) {
-            throw new RuntimeException("カテゴリーに所属する科目の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.text("service.course.categoryLoad"), e);
         }
     }
 
@@ -52,15 +57,15 @@ public class CourseService extends AbstractRepositoryService<Course> {
         try {
             courseRepository.save(course);
         } catch (Exception e) {
-            throw new RuntimeException("科目の追加に失敗しました。", e);
+            throw new RuntimeException(I18n.text("service.course.add"), e);
         }
     }
 
     public void updateCourse(Course course) {
-        requireEntity(course, "更新する科目が指定されていません。");
+        requireEntity(course, I18n.text("validation.course.updateRequired"));
 
         if (course.getId() == null) {
-            throw new IllegalArgumentException("更新する科目が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.course.updateRequired"));
         }
 
         validateCourse(course);
@@ -68,26 +73,26 @@ public class CourseService extends AbstractRepositoryService<Course> {
         try {
             courseRepository.update(course);
         } catch (Exception e) {
-            throw new RuntimeException("科目の更新に失敗しました。", e);
+            throw new RuntimeException(I18n.text("service.course.update"), e);
         }
     }
 
     public void deleteCourse(Integer id) {
-        requireId(id, "削除する科目が指定されていません。");
+        requireId(id, I18n.text("validation.course.deleteRequired"));
 
         try {
             courseRepository.deleteById(id);
         } catch (Exception e) {
-            throw new RuntimeException("科目の削除に失敗しました。", e);
+            throw new RuntimeException(I18n.text("service.course.delete"), e);
         }
     }
 
     private void validateCourse(Course course) {
-        requireEntity(course, "科目が指定されていません。");
-        course.setName(requireText(course.getName(), "科目名を入力してください。"));
+        requireEntity(course, I18n.text("validation.course.required"));
+        course.setName(requireText(course.getName(), I18n.text("validation.course.name")));
 
         if (course.getCredits() < 0) {
-            throw new IllegalArgumentException("単位数は0以上で入力してください。");
+            throw new IllegalArgumentException(I18n.text("validation.course.creditsNonNegative"));
         }
     }
 }

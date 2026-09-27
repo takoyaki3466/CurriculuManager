@@ -1,5 +1,6 @@
 package org.takoyaki.curriculummanager.service;
 
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Course;
 import org.takoyaki.curriculummanager.model.CourseCategory;
 import org.takoyaki.curriculummanager.model.Curriculum;
@@ -34,11 +35,11 @@ public class CurriculumService {
 
     public void addDepartment(Department department) throws SQLException {
         if (department == null) {
-            throw new IllegalArgumentException("学部が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.department.required"));
         }
 
         if (department.getName() == null || department.getName().isBlank()) {
-            throw new IllegalArgumentException("学部名を入力してください。");
+            throw new IllegalArgumentException(I18n.text("validation.department.name"));
         }
 
         departmentRepository.save(department);
@@ -46,11 +47,11 @@ public class CurriculumService {
 
     public void updateDepartment(Department department) throws SQLException {
         if (department == null || department.getId() == null) {
-            throw new IllegalArgumentException("更新する学部が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.department.updateRequired"));
         }
 
         if (department.getName() == null || department.getName().isBlank()) {
-            throw new IllegalArgumentException("学部名を入力してください。");
+            throw new IllegalArgumentException(I18n.text("validation.department.name"));
         }
 
         departmentRepository.update(department);
@@ -58,7 +59,7 @@ public class CurriculumService {
 
     public void deleteDepartment(Integer id) throws SQLException {
         if (id == null) {
-            throw new IllegalArgumentException("削除する学部が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.department.deleteRequired"));
         }
 
         departmentRepository.deleteById(id);
@@ -70,7 +71,7 @@ public class CurriculumService {
 
     public List<Major> getMajors(Integer departmentId) {
         if (departmentId == null) {
-            throw new IllegalArgumentException("学部が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.department.required"));
         }
 
         return majorRepository.findByDepartmentId(departmentId);
@@ -78,7 +79,7 @@ public class CurriculumService {
 
     public Major getMajor(Integer id) {
         if (id == null) {
-            throw new IllegalArgumentException("学科が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.major.required"));
         }
 
         return majorRepository.findById(id);
@@ -86,15 +87,15 @@ public class CurriculumService {
 
     public void addMajor(Major major) {
         if (major == null) {
-            throw new IllegalArgumentException("学科が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.major.required"));
         }
 
         if (major.getDepartmentId() == null) {
-            throw new IllegalArgumentException("所属する学部が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.major.departmentRequired"));
         }
 
         if (major.getName() == null || major.getName().isBlank()) {
-            throw new IllegalArgumentException("学科名を入力してください。");
+            throw new IllegalArgumentException(I18n.text("validation.major.name"));
         }
 
         majorRepository.save(major);
@@ -102,15 +103,15 @@ public class CurriculumService {
 
     public void updateMajor(Major major) {
         if (major == null || major.getId() == null) {
-            throw new IllegalArgumentException("更新する学科が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.major.updateRequired"));
         }
 
         if (major.getDepartmentId() == null) {
-            throw new IllegalArgumentException("所属する学部が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.major.departmentRequired"));
         }
 
         if (major.getName() == null || major.getName().isBlank()) {
-            throw new IllegalArgumentException("学科名を入力してください。");
+            throw new IllegalArgumentException(I18n.text("validation.major.name"));
         }
 
         majorRepository.update(major);
@@ -118,7 +119,7 @@ public class CurriculumService {
 
     public void deleteMajor(Integer id) {
         if (id == null) {
-            throw new IllegalArgumentException("削除する学科が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.major.deleteRequired"));
         }
 
         majorRepository.deleteById(id);
@@ -126,7 +127,7 @@ public class CurriculumService {
 
     public List<Curriculum> getCurricula(Integer majorId) {
         if (majorId == null) {
-            throw new IllegalArgumentException("学科が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.major.required"));
         }
 
         return curriculumRepository.findByMajorId(majorId);
@@ -138,7 +139,7 @@ public class CurriculumService {
 
     public Curriculum getCurriculum(Integer id) {
         if (id == null) {
-            throw new IllegalArgumentException("カリキュラムが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.curriculum.required"));
         }
 
         return curriculumRepository.findById(id);
@@ -146,19 +147,19 @@ public class CurriculumService {
 
     public void addCurriculum(Curriculum curriculum) {
         if (curriculum == null) {
-            throw new IllegalArgumentException("カリキュラムが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.curriculum.required"));
         }
 
         if (curriculum.getMajorId() == null) {
-            throw new IllegalArgumentException("学科が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.major.required"));
         }
 
         if (curriculum.getName() == null || curriculum.getName().isBlank()) {
-            throw new IllegalArgumentException("カリキュラム名を入力してください。");
+            throw new IllegalArgumentException(I18n.text("validation.curriculum.name"));
         }
 
         if (curriculum.getStartYear() <= 0) {
-            throw new IllegalArgumentException("開始年度が正しくありません。");
+            throw new IllegalArgumentException(I18n.text("validation.curriculum.year"));
         }
 
         curriculumRepository.save(curriculum);
@@ -166,19 +167,19 @@ public class CurriculumService {
 
     public void updateCurriculum(Curriculum curriculum) {
         if (curriculum == null || curriculum.getId() == null) {
-            throw new IllegalArgumentException("更新するカリキュラムが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.curriculum.updateRequired"));
         }
 
         if (curriculum.getMajorId() == null) {
-            throw new IllegalArgumentException("学科が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.major.required"));
         }
 
         if (curriculum.getName() == null || curriculum.getName().isBlank()) {
-            throw new IllegalArgumentException("カリキュラム名を入力してください。");
+            throw new IllegalArgumentException(I18n.text("validation.curriculum.name"));
         }
 
         if (curriculum.getStartYear() <= 0) {
-            throw new IllegalArgumentException("開始年度が正しくありません。");
+            throw new IllegalArgumentException(I18n.text("validation.curriculum.year"));
         }
 
         curriculumRepository.update(curriculum);
@@ -186,7 +187,7 @@ public class CurriculumService {
 
     public void deleteCurriculum(Integer id) {
         if (id == null) {
-            throw new IllegalArgumentException("削除するカリキュラムが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.curriculum.deleteRequired"));
         }
 
         curriculumRepository.deleteById(id);
@@ -194,7 +195,7 @@ public class CurriculumService {
 
     public List<CourseCategory> getCategories(Integer curriculumId) throws SQLException {
         if (curriculumId == null) {
-            throw new IllegalArgumentException("カリキュラムが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.curriculum.required"));
         }
 
         return categoryRepository.findByCurriculumId(curriculumId);
@@ -202,15 +203,15 @@ public class CurriculumService {
 
     public void addCategory(CourseCategory category) throws SQLException {
         if (category == null) {
-            throw new IllegalArgumentException("カテゴリが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.category.required"));
         }
 
         if (category.getCurriculumId() == null) {
-            throw new IllegalArgumentException("所属するカリキュラムが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.category.curriculumRequired"));
         }
 
         if (category.getName() == null || category.getName().isBlank()) {
-            throw new IllegalArgumentException("カテゴリ名を入力してください。");
+            throw new IllegalArgumentException(I18n.text("validation.category.name"));
         }
 
         categoryRepository.save(category);
@@ -218,7 +219,7 @@ public class CurriculumService {
 
     public List<Course> getCourses(Integer categoryId) throws SQLException {
         if (categoryId == null) {
-            throw new IllegalArgumentException("カテゴリが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.category.required"));
         }
 
         return courseRepository.findByCategoryId(categoryId);
@@ -226,7 +227,7 @@ public class CurriculumService {
 
     public Course getCourse(Integer id) throws SQLException {
         if (id == null) {
-            throw new IllegalArgumentException("科目が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.course.required"));
         }
 
         return courseRepository.findById(id);
@@ -234,15 +235,15 @@ public class CurriculumService {
 
     public void addCourse(Course course) throws SQLException {
         if (course == null) {
-            throw new IllegalArgumentException("科目が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.course.required"));
         }
 
         if (course.getName() == null || course.getName().isBlank()) {
-            throw new IllegalArgumentException("科目名を入力してください。");
+            throw new IllegalArgumentException(I18n.text("validation.course.name"));
         }
 
         if (course.getCredits() <= 0) {
-            throw new IllegalArgumentException("単位数は0より大きい値を指定してください。");
+            throw new IllegalArgumentException(I18n.text("validation.course.creditsPositive"));
         }
 
         courseRepository.save(course);
@@ -250,15 +251,15 @@ public class CurriculumService {
 
     public void updateCourse(Course course) throws SQLException {
         if (course == null || course.getId() == null) {
-            throw new IllegalArgumentException("更新する科目が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.course.updateRequired"));
         }
 
         if (course.getName() == null || course.getName().isBlank()) {
-            throw new IllegalArgumentException("科目名を入力してください。");
+            throw new IllegalArgumentException(I18n.text("validation.course.name"));
         }
 
         if (course.getCredits() <= 0) {
-            throw new IllegalArgumentException("単位数は0より大きい値を指定してください。");
+            throw new IllegalArgumentException(I18n.text("validation.course.creditsPositive"));
         }
 
         courseRepository.update(course);
@@ -266,7 +267,7 @@ public class CurriculumService {
 
     public void deleteCourse(Integer id) throws SQLException {
         if (id == null) {
-            throw new IllegalArgumentException("削除する科目が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.course.deleteRequired"));
         }
 
         courseRepository.deleteById(id);
@@ -274,11 +275,11 @@ public class CurriculumService {
 
     public void updateCategory(CourseCategory category) {
         if (category == null || category.getId() == null) {
-            throw new IllegalArgumentException("更新するカテゴリが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.category.updateRequired"));
         }
 
         if (category.getName() == null || category.getName().isBlank()) {
-            throw new IllegalArgumentException("カテゴリ名を入力してください。");
+            throw new IllegalArgumentException(I18n.text("validation.category.name"));
         }
 
         category.setName(category.getName().trim());
@@ -292,7 +293,7 @@ public class CurriculumService {
 
     public void deleteCategory(Integer id) {
         if (id == null) {
-            throw new IllegalArgumentException("削除するカテゴリが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.category.deleteRequired"));
         }
 
         try {

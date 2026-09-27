@@ -28,70 +28,69 @@
                 <Insets top="14" right="14" bottom="14" left="14"/>
             </padding>
 
-            <Label text="ダッシュボード" styleClass="title-label"/>
+            <Label text="%nav.dashboard" styleClass="title-label"/>
 
             <VBox spacing="9" styleClass="toolbar-card">
-                <Label fx:id="academicContextLabel" text="学部・学科未設定" styleClass="context-label"/>
+                <Label fx:id="academicContextLabel" text="%common.notConfigured" styleClass="context-label"/>
 
                 <FlowPane styleClass="responsive-flow" prefWrapLength="760">
                     <HBox styleClass="field-group">
-                        <Label text="学部"/>
-                        <ComboBox fx:id="departmentComboBox" styleClass="compact-combo" promptText="学部を選択"/>
+                        <Label text="%common.department"/>
+                        <ComboBox fx:id="departmentComboBox" styleClass="compact-combo" promptText="%common.department.select"/>
                     </HBox>
-                    <Button text="学部追加" onAction="#addDepartment" styleClass="primary-button"/>
+                    <Button text="%common.department.add" onAction="#addDepartment" styleClass="primary-button"/>
 
                     <HBox styleClass="field-group">
-                        <Label text="学科"/>
-                        <ComboBox fx:id="majorComboBox" styleClass="compact-combo" promptText="学科を選択"/>
+                        <Label text="%common.major"/>
+                        <ComboBox fx:id="majorComboBox" styleClass="compact-combo" promptText="%common.major.select"/>
                     </HBox>
-                    <Button text="学科追加" onAction="#addMajor" styleClass="primary-button"/>
+                    <Button text="%common.major.add" onAction="#addMajor" styleClass="primary-button"/>
                 </FlowPane>
             </VBox>
 
             <FlowPane styleClass="responsive-flow" prefWrapLength="760">
                 <VBox spacing="5" styleClass="card,dashboard-card">
-                    <Label text="全年度 合計GPA" styleClass="dashboard-caption"/>
+                    <Label text="%dashboard.totalGpa" styleClass="dashboard-caption"/>
                     <Label fx:id="gpaLabel" text="0.00" styleClass="dashboard-value"/>
                 </VBox>
 
                 <VBox spacing="5" styleClass="card,dashboard-card">
-                    <Label text="全年度 合計修得単位" styleClass="dashboard-caption"/>
-                    <Label fx:id="earnedCreditsLabel" text="0.0 単位" styleClass="dashboard-value"/>
+                    <Label text="%dashboard.totalCredits" styleClass="dashboard-caption"/>
+                    <Label fx:id="earnedCreditsLabel" text="%dashboard.creditsValue" styleClass="dashboard-value"/>
                 </VBox>
 
                 <VBox spacing="5" styleClass="card,dashboard-card">
-                    <Label text="現在の卒業判定" styleClass="dashboard-caption"/>
-                    <Label fx:id="graduationPossibleLabel" text="卒業不可" styleClass="dashboard-value"/>
+                    <Label text="%dashboard.graduationStatus" styleClass="dashboard-caption"/>
+                    <Label fx:id="graduationPossibleLabel" text="%dashboard.notGraduated" styleClass="dashboard-value"/>
                 </VBox>
 
-                <Button text="情報を更新" onAction="#refresh" styleClass="secondary-button"/>
+                <Button text="%dashboard.refresh" onAction="#refresh" styleClass="secondary-button"/>
             </FlowPane>
 
-            <!-- 小画面では縦に並べることで左右の圧迫を防ぐ -->
             <VBox spacing="14" VBox.vgrow="ALWAYS">
                 <VBox spacing="8" styleClass="card">
-                    <Label text="年度別 GPA・修得単位" styleClass="section-title"/>
+                    <Label text="%dashboard.yearlySummary" styleClass="section-title"/>
 
                     <TableView fx:id="yearlySummaryTable" prefHeight="220">
                         <columns>
-                            <TableColumn fx:id="yearColumn" text="年度" minWidth="90" prefWidth="100"/>
+                            <TableColumn fx:id="yearColumn" text="%common.year" minWidth="90" prefWidth="100"/>
                             <TableColumn fx:id="yearlyGpaColumn" text="GPA" minWidth="90" prefWidth="110"/>
-                            <TableColumn fx:id="yearlyCreditsColumn" text="修得単位" minWidth="120" prefWidth="150"/>
+                            <TableColumn fx:id="yearlyCreditsColumn" text="%common.earnedCredits" minWidth="120" prefWidth="150"/>
                         </columns>
                         <placeholder>
-                            <Label text="年度が登録された履修はありません。"/>
+                            <Label text="%dashboard.noYearlyData"/>
                         </placeholder>
                     </TableView>
                 </VBox>
 
                 <VBox spacing="8" styleClass="card" VBox.vgrow="ALWAYS">
-                    <Label text="カリキュラム・卒業要件一覧" styleClass="section-title"/>
+                    <Label text="%dashboard.requirements" styleClass="section-title"/>
 
                     <ListView fx:id="curriculumRequirementListView"
                               prefHeight="260"
                               VBox.vgrow="ALWAYS">
                         <placeholder>
-                            <Label text="登録されているカリキュラムがありません。"/>
+                            <Label text="%dashboard.noCurricula"/>
                         </placeholder>
                     </ListView>
                 </VBox>

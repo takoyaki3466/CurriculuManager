@@ -1,5 +1,7 @@
 package org.takoyaki.curriculummanager.database;
 
+import org.takoyaki.curriculummanager.i18n.I18n;
+
 import org.takoyaki.curriculummanager.database.tables.CourseTable;
 import org.takoyaki.curriculummanager.database.tables.AppSettingsTable;
 import org.takoyaki.curriculummanager.database.tables.CurriculaTable;
@@ -31,7 +33,7 @@ public final class DatabaseInit {
             EnrollmentsTable.createEnrollmentsTable(connection);
             GradeDefTable.insertDefaultGradeDefinitions(connection);
         } catch (SQLException e) {
-            throw new RuntimeException("データベースの初期化に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("database.error.initialize"), e);
         }
 
         GradeDefInit.initialize();

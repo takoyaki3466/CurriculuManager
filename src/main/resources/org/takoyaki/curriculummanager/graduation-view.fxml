@@ -27,71 +27,71 @@
                 <Insets top="14" right="14" bottom="14" left="14"/>
             </padding>
 
-            <Label text="卒業要件" styleClass="title-label"/>
+            <Label text="%graduation.title" styleClass="title-label"/>
 
             <VBox spacing="9" styleClass="toolbar-card">
-                <Label fx:id="academicContextLabel" text="学部・学科未設定" styleClass="context-label"/>
+                <Label fx:id="academicContextLabel" text="%common.notConfigured" styleClass="context-label"/>
 
                 <FlowPane styleClass="responsive-flow" prefWrapLength="760">
                     <HBox styleClass="field-group">
-                        <Label text="カリキュラム"/>
-                        <ComboBox fx:id="curriculumComboBox" styleClass="wide-combo" promptText="カリキュラムを選択"/>
+                        <Label text="%common.curriculum"/>
+                        <ComboBox fx:id="curriculumComboBox" styleClass="wide-combo" promptText="%common.curriculum.select"/>
                     </HBox>
 
-                    <Button text="卒業要件追加" onAction="#addRequirement" styleClass="primary-button"/>
-                    <Button text="卒業要件編集" onAction="#editRequirement" styleClass="secondary-button"/>
-                    <Button text="更新" onAction="#refresh" styleClass="secondary-button"/>
+                    <Button text="%graduation.add" onAction="#addRequirement" styleClass="primary-button"/>
+                    <Button text="%graduation.edit" onAction="#editRequirement" styleClass="secondary-button"/>
+                    <Button text="%common.refresh" onAction="#refresh" styleClass="secondary-button"/>
                 </FlowPane>
             </VBox>
 
             <FlowPane styleClass="responsive-flow" prefWrapLength="760">
                 <VBox spacing="5" styleClass="card,graduation-summary-card">
-                    <Label text="卒業判定" styleClass="dashboard-caption"/>
+                    <Label text="%graduation.judgement" styleClass="dashboard-caption"/>
                     <Label fx:id="graduationStatusLabel"
-                           text="カリキュラム未選択"
+                           text="%graduation.curriculumNotSelected"
                            wrapText="true"
                            styleClass="graduation-summary-value"/>
                 </VBox>
 
                 <VBox spacing="5" styleClass="card,graduation-summary-card">
-                    <Label text="修得単位" styleClass="dashboard-caption"/>
+                    <Label text="%common.earnedCredits" styleClass="dashboard-caption"/>
                     <Label fx:id="totalCreditsLabel"
-                           text="修得単位: 0.0"
+                           text="%graduation.creditsValue"
                            wrapText="true"
                            styleClass="graduation-summary-value"/>
                 </VBox>
             </FlowPane>
 
             <VBox spacing="8" styleClass="card">
-                <Label text="卒業要件" styleClass="section-title"/>
+                <Label text="%graduation.title" styleClass="section-title"/>
 
                 <TableView fx:id="requirementTable" prefHeight="240">
                     <columns>
-                        <TableColumn fx:id="nameColumn" text="要件" minWidth="180" prefWidth="230"/>
-                        <TableColumn fx:id="targetCategoriesColumn" text="対象" minWidth="220" prefWidth="300"/>
-                        <TableColumn fx:id="requiredColumn" text="必要単位" minWidth="90" prefWidth="100"/>
-                        <TableColumn fx:id="earnedColumn" text="修得単位" minWidth="90" prefWidth="100"/>
-                        <TableColumn fx:id="remainingColumn" text="残り" minWidth="75" prefWidth="90"/>
-                        <TableColumn fx:id="statusColumn" text="状態" minWidth="80" prefWidth="90"/>
+                        <TableColumn fx:id="nameColumn" text="%graduation.requirement" minWidth="180" prefWidth="230"/>
+                        <TableColumn fx:id="targetCategoriesColumn" text="%graduation.target" minWidth="220" prefWidth="300"/>
+                        <TableColumn fx:id="requiredColumn" text="%graduation.requiredCredits" minWidth="90" prefWidth="100"/>
+                        <TableColumn fx:id="earnedColumn" text="%common.earnedCredits" minWidth="90" prefWidth="100"/>
+                        <TableColumn fx:id="remainingColumn" text="%graduation.remaining" minWidth="75" prefWidth="90"/>
+                        <TableColumn fx:id="statusColumn" text="%common.status" minWidth="80" prefWidth="90"/>
                     </columns>
                     <placeholder>
-                        <Label text="卒業要件が登録されていません。"/>
+                        <Label text="%graduation.noRequirements"/>
                     </placeholder>
                 </TableView>
             </VBox>
 
             <VBox spacing="8" styleClass="card" VBox.vgrow="ALWAYS">
-                <Label text="必修科目" styleClass="section-title"/>
+                <Label text="%graduation.mandatoryCourses" styleClass="section-title"/>
 
                 <TableView fx:id="mandatoryCourseTable" prefHeight="250" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="mandatoryCourseCodeColumn" text="科目コード" minWidth="110" prefWidth="140"/>
-                        <TableColumn fx:id="mandatoryCourseNameColumn" text="科目名" minWidth="240" prefWidth="360"/>
-                        <TableColumn fx:id="mandatoryCreditsColumn" text="単位" minWidth="70" prefWidth="80"/>
-                        <TableColumn fx:id="mandatoryStatusColumn" text="修得状況" minWidth="100" prefWidth="120"/>
+                        <TableColumn fx:id="mandatoryCourseCodeColumn" text="%common.course.code" minWidth="110" prefWidth="140"/>
+                        <TableColumn fx:id="mandatoryCourseNameColumn" text="%common.course.name" minWidth="240" prefWidth="360"/>
+                        <TableColumn fx:id="mandatoryCreditsColumn" text="%common.credits" minWidth="70" prefWidth="80"/>
+                        <TableColumn fx:id="mandatoryStatusColumn" text="%graduation.completionStatus" minWidth="100" prefWidth="120"/>
                     </columns>
                     <placeholder>
-                        <Label text="必修科目が登録されていません。"/>
+                        <Label text="%graduation.noMandatoryCourses"/>
                     </placeholder>
                 </TableView>
             </VBox>

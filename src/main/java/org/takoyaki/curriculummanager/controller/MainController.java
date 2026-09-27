@@ -39,4 +39,14 @@ public class MainController {
     private void openGraduation() {
         viewManager.showGraduation();
     }
+
+    @FXML
+    private void openDatabaseTransfer() {
+        viewManager.showDatabaseTransfer();
+    }
+
+    @FXML
+    private void openQa() {
+        viewManager.showQa();
+    }
 }

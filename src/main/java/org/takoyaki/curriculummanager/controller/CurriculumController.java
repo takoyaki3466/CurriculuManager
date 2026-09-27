@@ -4,7 +4,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -20,6 +19,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import org.takoyaki.curriculummanager.controller.abstracts.AbstractAcademicContextController;
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Course;
 import org.takoyaki.curriculummanager.model.CourseCategory;
 import org.takoyaki.curriculummanager.model.Curriculum;
@@ -31,11 +31,17 @@ import org.takoyaki.curriculummanager.service.CourseService;
 import org.takoyaki.curriculummanager.service.CurriculumCourseService;
 import org.takoyaki.curriculummanager.service.CurriculumService;
 import org.takoyaki.curriculummanager.service.DepartmentService;
+import org.takoyaki.curriculummanager.view.dialog.AppAlerts;
+import org.takoyaki.curriculummanager.view.dialog.AppDialogs;
+
 import java.sql.SQLException;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static org.takoyaki.curriculummanager.util.RequirementTypeUtils.ELECTIVE;
+import static org.takoyaki.curriculummanager.util.RequirementTypeUtils.REQUIRED;
 
 public class CurriculumController extends AbstractAcademicContextController {
     @FXML
@@ -91,7 +97,10 @@ public class CurriculumController extends AbstractAcademicContextController {
     }
 
     private void setupSelectionListeners() {
-        curriculumComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadCategories(newValue));
+        curriculumComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            saveCurrentCurriculum(newValue);
+            loadCategories(newValue);
+        });
         categoryList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadCourses(newValue));
     }
 
@@ -119,10 +128,12 @@ public class CurriculumController extends AbstractAcademicContextController {
 
     @FXML
     private void addDepartment() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("学部追加");
-        dialog.setHeaderText("新しい学部を追加します。");
-        dialog.setContentText("学部名:");
+        TextInputDialog dialog = AppDialogs.textInput(
+                null,
+                I18n.text("curriculum.department.add.title"),
+                I18n.text("curriculum.department.add.header"),
+                I18n.text("curriculum.department.name")
+        );
         Optional<String> result = dialog.showAndWait();
 
         if (result.isEmpty()) {
@@ -132,7 +143,7 @@ public class CurriculumController extends AbstractAcademicContextController {
         String name = result.get().trim();
 
         if (name.isBlank()) {
-            showError("学部名を入力してください。");
+            showError(I18n.text("curriculum.error.departmentName"));
             return;
         }
 
@@ -141,7 +152,7 @@ public class CurriculumController extends AbstractAcademicContextController {
             departmentService.addDepartment(department);
             loadDepartments();
         } catch (Exception e) {
-            showError("学部の追加に失敗しました。", e);
+            showError(I18n.text("curriculum.error.departmentAdd"), e);
         }
     }
 
@@ -150,14 +161,16 @@ public class CurriculumController extends AbstractAcademicContextController {
         Department department = departmentComboBox.getSelectionModel().getSelectedItem();
 
         if (department == null) {
-            showError("編集する学部を選択してください。");
+            showError(I18n.text("curriculum.error.departmentEditSelection"));
             return;
         }
 
-        TextInputDialog dialog = new TextInputDialog(department.getName());
-        dialog.setTitle("学部編集");
-        dialog.setHeaderText("学部名を変更します。");
-        dialog.setContentText("学部名:");
+        TextInputDialog dialog = AppDialogs.textInput(
+                department.getName(),
+                I18n.text("curriculum.department.edit.title"),
+                I18n.text("curriculum.department.edit.header"),
+                I18n.text("curriculum.department.name")
+        );
         Optional<String> result = dialog.showAndWait();
 
         if (result.isEmpty()) {
@@ -167,7 +180,7 @@ public class CurriculumController extends AbstractAcademicContextController {
         String name = result.get().trim();
 
         if (name.isBlank()) {
-            showError("学部名を入力してください。");
+            showError(I18n.text("curriculum.error.departmentName"));
             return;
         }
 
@@ -178,7 +191,7 @@ public class CurriculumController extends AbstractAcademicContextController {
             loadDepartments();
             selectDepartment(departmentId);
         } catch (Exception e) {
-            showError("学部の更新に失敗しました。", e);
+            showError(I18n.text("curriculum.error.departmentUpdate"), e);
         }
     }
 
@@ -187,17 +200,17 @@ public class CurriculumController extends AbstractAcademicContextController {
         Department department = departmentComboBox.getSelectionModel().getSelectedItem();
 
         if (department == null) {
-            showError("削除する学部を選択してください。");
+            showError(I18n.text("curriculum.error.departmentDeleteSelection"));
             return;
         }
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("学部削除");
-        alert.setHeaderText("学部を削除します。");
-        alert.setContentText("「" + department.getName() + "」を削除しますか？\n\n" + "この学部に所属する学科・" + "カリキュラム・" + "カテゴリなども削除されます。\n" + "この操作は元に戻せません。");
-        Optional<ButtonType> result = alert.showAndWait();
+        boolean confirmed = AppAlerts.confirm(
+                I18n.text("curriculum.department.delete.title"),
+                I18n.text("curriculum.department.delete.header"),
+                I18n.text("curriculum.department.delete.content", department.getName())
+        );
 
-        if (result.isEmpty() || result.get() != ButtonType.OK) {
+        if (!confirmed) {
             return;
         }
 
@@ -205,7 +218,7 @@ public class CurriculumController extends AbstractAcademicContextController {
             departmentService.deleteDepartment(department.getId());
             loadDepartments();
         } catch (Exception e) {
-            showError("学部の削除に失敗しました。", e);
+            showError(I18n.text("curriculum.error.departmentDelete"), e);
         }
     }
 
@@ -230,14 +243,16 @@ public class CurriculumController extends AbstractAcademicContextController {
         Department department = departmentComboBox.getSelectionModel().getSelectedItem();
 
         if (department == null) {
-            showError("先に学部を選択してください。");
+            showError(I18n.text("curriculum.error.departmentFirst"));
             return;
         }
 
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("学科追加");
-        dialog.setHeaderText("「" + department.getName() + "」に学科を追加します。");
-        dialog.setContentText("学科名:");
+        TextInputDialog dialog = AppDialogs.textInput(
+                null,
+                I18n.text("curriculum.major.add.title"),
+                I18n.text("curriculum.major.add.header", department.getName()),
+                I18n.text("curriculum.major.name")
+        );
         Optional<String> result = dialog.showAndWait();
 
         if (result.isEmpty()) {
@@ -247,7 +262,7 @@ public class CurriculumController extends AbstractAcademicContextController {
         String name = result.get().trim();
 
         if (name.isBlank()) {
-            showError("学科名を入力してください。");
+            showError(I18n.text("curriculum.error.majorName"));
             return;
         }
 
@@ -256,7 +271,7 @@ public class CurriculumController extends AbstractAcademicContextController {
             service.addMajor(major);
             loadMajors(department);
         } catch (Exception e) {
-            showError("学科の追加に失敗しました。", e);
+            showError(I18n.text("curriculum.error.majorAdd"), e);
         }
     }
 
@@ -275,7 +290,7 @@ public class CurriculumController extends AbstractAcademicContextController {
         items.add(Curriculum.allOption());
         items.addAll(curricula);
         curriculumComboBox.setItems(items);
-        curriculumComboBox.getSelectionModel().selectFirst();
+        selectCurrentCurriculum(curriculumComboBox);
     }
 
     @FXML
@@ -283,14 +298,16 @@ public class CurriculumController extends AbstractAcademicContextController {
         Major major = academicContextService.getCurrentMajor();
 
         if (major == null) {
-            showError("先に学科を選択してください。");
+            showError(I18n.text("curriculum.error.majorFirst"));
             return;
         }
 
-        TextInputDialog nameDialog = new TextInputDialog();
-        nameDialog.setTitle("カリキュラム追加");
-        nameDialog.setHeaderText("新しいカリキュラムを追加します。");
-        nameDialog.setContentText("カリキュラム名:");
+        TextInputDialog nameDialog = AppDialogs.textInput(
+                null,
+                I18n.text("curriculum.curriculum.add.title"),
+                I18n.text("curriculum.curriculum.add.header"),
+                I18n.text("curriculum.curriculum.name")
+        );
         Optional<String> nameResult = nameDialog.showAndWait();
 
         if (nameResult.isEmpty()) {
@@ -300,14 +317,16 @@ public class CurriculumController extends AbstractAcademicContextController {
         String name = nameResult.get().trim();
 
         if (name.isBlank()) {
-            showError("カリキュラム名を入力してください。");
+            showError(I18n.text("curriculum.error.curriculumName"));
             return;
         }
 
-        TextInputDialog yearDialog = new TextInputDialog(String.valueOf(java.time.Year.now().getValue()));
-        yearDialog.setTitle("カリキュラム追加");
-        yearDialog.setHeaderText("開始年度を入力します。");
-        yearDialog.setContentText("開始年度:");
+        TextInputDialog yearDialog = AppDialogs.textInput(
+                String.valueOf(java.time.Year.now().getValue()),
+                I18n.text("curriculum.curriculum.add.title"),
+                I18n.text("curriculum.curriculum.startYear.header"),
+                I18n.text("curriculum.curriculum.startYear")
+        );
         Optional<String> yearResult = yearDialog.showAndWait();
 
         if (yearResult.isEmpty()) {
@@ -319,7 +338,7 @@ public class CurriculumController extends AbstractAcademicContextController {
         try {
             startYear = Integer.parseInt(yearResult.get().trim());
         } catch (NumberFormatException e) {
-            showError("開始年度には数字を入力してください。");
+            showError(I18n.text("curriculum.error.startYear"));
             return;
         }
 
@@ -328,7 +347,7 @@ public class CurriculumController extends AbstractAcademicContextController {
             service.addCurriculum(curriculum);
             loadCurricula(major);
         } catch (Exception e) {
-            showError("カリキュラムの追加に失敗しました。", e);
+            showError(I18n.text("curriculum.error.curriculumAdd"), e);
         }
     }
 
@@ -337,14 +356,19 @@ public class CurriculumController extends AbstractAcademicContextController {
         Curriculum curriculum = curriculumComboBox.getValue();
 
         if (curriculum == null || curriculum.isAllOption()) {
-            showError("カリキュラム編集", new Exception("編集するカリキュラムを選択してください。"));
+            showError(
+                    I18n.text("curriculum.curriculum.edit.title"),
+                    new Exception(I18n.text("curriculum.error.curriculumEditSelection"))
+            );
             return;
         }
 
-        TextInputDialog dialog = new TextInputDialog(curriculum.getName());
-        dialog.setTitle("カリキュラム編集");
-        dialog.setHeaderText("カリキュラム名を変更します。");
-        dialog.setContentText("カリキュラム名:");
+        TextInputDialog dialog = AppDialogs.textInput(
+                curriculum.getName(),
+                I18n.text("curriculum.curriculum.edit.title"),
+                I18n.text("curriculum.curriculum.edit.header"),
+                I18n.text("curriculum.curriculum.name")
+        );
         Optional<String> result = dialog.showAndWait();
 
         if (result.isEmpty()) {
@@ -354,7 +378,10 @@ public class CurriculumController extends AbstractAcademicContextController {
         String name = result.get().trim();
 
         if (name.isBlank()) {
-            showError("カリキュラム編集", new Exception("カリキュラム名を入力してください。"));
+            showError(
+                    I18n.text("curriculum.curriculum.edit.title"),
+                    new Exception(I18n.text("curriculum.error.curriculumName"))
+            );
             return;
         }
 
@@ -369,7 +396,10 @@ public class CurriculumController extends AbstractAcademicContextController {
                 selectCurriculumById(curriculumId);
             }
         } catch (Exception e) {
-            showError("カリキュラム編集", new Exception("カリキュラムの更新に失敗しました。\n" + e.getMessage()));
+            showError(
+                    I18n.text("curriculum.curriculum.edit.title"),
+                    new Exception(I18n.text("curriculum.error.curriculumUpdate", e.getMessage()))
+            );
         }
     }
 
@@ -378,17 +408,20 @@ public class CurriculumController extends AbstractAcademicContextController {
         Curriculum curriculum = curriculumComboBox.getValue();
 
         if (curriculum == null || curriculum.isAllOption()) {
-            showError("カリキュラム削除", new Exception("削除するカリキュラムを選択してください。"));
+            showError(
+                    I18n.text("curriculum.curriculum.delete.title"),
+                    new Exception(I18n.text("curriculum.error.curriculumDeleteSelection"))
+            );
             return;
         }
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("カリキュラム削除");
-        alert.setHeaderText("カリキュラムを削除します。");
-        alert.setContentText("「" + curriculum.getName() + "」を削除しますか？\n\n" + "このカリキュラムに所属する" + "カテゴリ・卒業要件・" + "カリキュラムと科目の関連も" + "削除されます。\n\n" + "科目そのものは削除されません。\n\n" + "この操作は元に戻せません。");
-        Optional<ButtonType> result = alert.showAndWait();
+        boolean confirmed = AppAlerts.confirm(
+                I18n.text("curriculum.curriculum.delete.title"),
+                I18n.text("curriculum.curriculum.delete.header"),
+                I18n.text("curriculum.curriculum.delete.content", curriculum.getName())
+        );
 
-        if (result.isEmpty() || result.get() != ButtonType.OK) {
+        if (!confirmed) {
             return;
         }
 
@@ -400,7 +433,10 @@ public class CurriculumController extends AbstractAcademicContextController {
                 loadCurricula(major);
             }
         } catch (Exception e) {
-            showError("カリキュラム削除", new Exception("カリキュラムの削除に失敗しました。\n" + e.getMessage()));
+            showError(
+                    I18n.text("curriculum.curriculum.delete.title"),
+                    new Exception(I18n.text("curriculum.error.curriculumDelete", e.getMessage()))
+            );
         }
     }
 
@@ -441,7 +477,7 @@ public class CurriculumController extends AbstractAcademicContextController {
                 categories = courseCategoryService.getCategories(curriculum.getId());
             }
         } catch (Exception e) {
-            throw new RuntimeException("カテゴリーの取得に失敗しました。", e);
+            throw new RuntimeException(I18n.text("curriculum.error.categoryLoad"), e);
         }
 
         categoryList.setItems(FXCollections.observableArrayList(categories));
@@ -460,14 +496,16 @@ public class CurriculumController extends AbstractAcademicContextController {
         Curriculum curriculum = curriculumComboBox.getSelectionModel().getSelectedItem();
 
         if (curriculum == null || curriculum.isAllOption()) {
-            showError("追加先のカリキュラムを選択してください。");
+            showError(I18n.text("curriculum.error.curriculumTarget"));
             return;
         }
 
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("カテゴリ追加");
-        dialog.setHeaderText("カテゴリを追加します。");
-        dialog.setContentText("カテゴリ名:");
+        TextInputDialog dialog = AppDialogs.textInput(
+                null,
+                I18n.text("curriculum.category.add.title"),
+                I18n.text("curriculum.category.add.header"),
+                I18n.text("curriculum.category.name")
+        );
         Optional<String> result = dialog.showAndWait();
 
         if (result.isEmpty()) {
@@ -477,7 +515,7 @@ public class CurriculumController extends AbstractAcademicContextController {
         String name = result.get().trim();
 
         if (name.isBlank()) {
-            showError("カテゴリ名を入力してください。");
+            showError(I18n.text("curriculum.error.categoryName"));
             return;
         }
 
@@ -486,7 +524,7 @@ public class CurriculumController extends AbstractAcademicContextController {
             courseCategoryService.addCategory(category);
             loadCategories(curriculum);
         } catch (Exception e) {
-            showError("カテゴリの追加に失敗しました。", e);
+            showError(I18n.text("curriculum.error.categoryAdd"), e);
         }
     }
 
@@ -495,14 +533,19 @@ public class CurriculumController extends AbstractAcademicContextController {
         CourseCategory category = categoryList.getSelectionModel().getSelectedItem();
 
         if (category == null) {
-            showError("カテゴリ編集", new Exception("編集するカテゴリを選択してください。"));
+            showError(
+                    I18n.text("curriculum.category.edit.title"),
+                    new Exception(I18n.text("curriculum.error.categoryEditSelection"))
+            );
             return;
         }
 
-        TextInputDialog dialog = new TextInputDialog(category.getName());
-        dialog.setTitle("カテゴリ編集");
-        dialog.setHeaderText("カテゴリ名を変更します。");
-        dialog.setContentText("カテゴリ名:");
+        TextInputDialog dialog = AppDialogs.textInput(
+                category.getName(),
+                I18n.text("curriculum.category.edit.title"),
+                I18n.text("curriculum.category.edit.header"),
+                I18n.text("curriculum.category.name")
+        );
         Optional<String> result = dialog.showAndWait();
 
         if (result.isEmpty()) {
@@ -512,7 +555,10 @@ public class CurriculumController extends AbstractAcademicContextController {
         String name = result.get().trim();
 
         if (name.isBlank()) {
-            showError("カテゴリ編集", new Exception("カテゴリ名を入力してください。"));
+            showError(
+                    I18n.text("curriculum.category.edit.title"),
+                    new Exception(I18n.text("curriculum.error.categoryName"))
+            );
             return;
         }
 
@@ -527,7 +573,10 @@ public class CurriculumController extends AbstractAcademicContextController {
                 selectCategoryById(categoryId);
             }
         } catch (Exception e) {
-            showError("カテゴリ編集", new Exception("カテゴリの更新に失敗しました。\n" + e.getMessage()));
+            showError(
+                    I18n.text("curriculum.category.edit.title"),
+                    new Exception(I18n.text("curriculum.error.categoryUpdate", e.getMessage()))
+            );
         }
     }
 
@@ -536,17 +585,20 @@ public class CurriculumController extends AbstractAcademicContextController {
         CourseCategory category = categoryList.getSelectionModel().getSelectedItem();
 
         if (category == null) {
-            showError("カテゴリ削除", new Exception("削除するカテゴリを選択してください。"));
+            showError(
+                    I18n.text("curriculum.category.delete.title"),
+                    new Exception(I18n.text("curriculum.error.categoryDeleteSelection"))
+            );
             return;
         }
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("カテゴリ削除");
-        alert.setHeaderText("カテゴリを削除します。");
-        alert.setContentText("「" + category.getName() + "」を削除しますか？\n\n" + "このカテゴリに所属している" + "科目との関連も削除されます。\n" + "科目そのものは削除されません。\n\n" + "この操作は元に戻せません。");
-        Optional<ButtonType> result = alert.showAndWait();
+        boolean confirmed = AppAlerts.confirm(
+                I18n.text("curriculum.category.delete.title"),
+                I18n.text("curriculum.category.delete.header"),
+                I18n.text("curriculum.category.delete.content", category.getName())
+        );
 
-        if (result.isEmpty() || result.get() != ButtonType.OK) {
+        if (!confirmed) {
             return;
         }
 
@@ -558,7 +610,10 @@ public class CurriculumController extends AbstractAcademicContextController {
                 loadCategories(curriculum);
             }
         } catch (Exception e) {
-            showError("カテゴリ削除", new Exception("カテゴリの削除に失敗しました。\n" + e.getMessage()));
+            showError(
+                    I18n.text("curriculum.category.delete.title"),
+                    new Exception(I18n.text("curriculum.error.categoryDelete", e.getMessage()))
+            );
         }
     }
 
@@ -596,7 +651,7 @@ public class CurriculumController extends AbstractAcademicContextController {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("科目の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.text("curriculum.error.courseLoad"), e);
         }
 
         courseTable.setItems(FXCollections.observableArrayList(courses));
@@ -608,16 +663,22 @@ public class CurriculumController extends AbstractAcademicContextController {
         CourseCategory category = categoryList.getSelectionModel().getSelectedItem();
 
         if (curriculum == null || curriculum.isAllOption()) {
-            showError("追加先のカリキュラムを選択してください。");
+            showError(I18n.text("curriculum.error.curriculumTarget"));
             return;
         }
 
         if (category == null) {
-            showError("先にカテゴリを選択してください。");
+            showError(I18n.text("curriculum.error.categoryFirst"));
             return;
         }
 
-        Optional<CourseFormResult> courseResult = showCourseDialog(null, category, "選択", "科目追加", "追加");
+        Optional<CourseFormResult> courseResult = showCourseDialog(
+                null,
+                category,
+                ELECTIVE,
+                I18n.text("curriculum.course.add.title"),
+                I18n.text("dialog.button.add")
+        );
 
         if (courseResult.isEmpty()) {
             return;
@@ -630,7 +691,7 @@ public class CurriculumController extends AbstractAcademicContextController {
             curriculumCourseService.addCourseToCurriculum(curriculum.getId(), course.getId(), formResult.requirementType());
             loadCourses(category);
         } catch (Exception e) {
-            showError("科目の追加に失敗しました。", e);
+            showError(I18n.text("curriculum.error.courseAdd"), e);
         }
     }
 
@@ -641,7 +702,7 @@ public class CurriculumController extends AbstractAcademicContextController {
         Course course = courseTable.getSelectionModel().getSelectedItem();
 
         if (curriculum == null || curriculum.isAllOption() || category == null || course == null) {
-            showError("編集する科目を選択してください。");
+            showError(I18n.text("curriculum.error.courseEditSelection"));
             return;
         }
 
@@ -651,9 +712,15 @@ public class CurriculumController extends AbstractAcademicContextController {
                     .findFirst()
                     .orElse(null);
             String requirementType = relation == null || relation.getRequirementType() == null || relation.getRequirementType().isBlank()
-                    ? "選択"
+                    ? ELECTIVE
                     : relation.getRequirementType();
-            Optional<CourseFormResult> result = showCourseDialog(course, category, requirementType, "科目編集", "保存");
+            Optional<CourseFormResult> result = showCourseDialog(
+                    course,
+                    category,
+                    requirementType,
+                    I18n.text("curriculum.course.edit.title"),
+                    I18n.text("dialog.button.save")
+            );
 
             if (result.isEmpty()) {
                 return;
@@ -680,26 +747,27 @@ public class CurriculumController extends AbstractAcademicContextController {
                     .findFirst()
                     .ifPresent(item -> courseTable.getSelectionModel().select(item));
         } catch (Exception e) {
-            showError("科目の編集に失敗しました。", e);
+            showError(I18n.text("curriculum.error.courseEdit"), e);
         }
     }
 
     private Optional<CourseFormResult> showCourseDialog(Course course, CourseCategory category, String requirementType, String title, String saveText) {
-        Dialog<CourseFormResult> dialog = new Dialog<>();
-        dialog.setTitle(title);
-        dialog.setHeaderText("科目の情報と必修・選択区分をまとめて入力してください。");
+        Dialog<CourseFormResult> dialog = AppDialogs.create(
+                title,
+                I18n.text("curriculum.course.dialog.header")
+        );
         ButtonType saveButtonType = new ButtonType(saveText, ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
         TextField courseCodeField = new TextField(course == null || course.getCourseCode() == null ? "" : course.getCourseCode());
-        courseCodeField.setPromptText("例: CS101");
+        courseCodeField.setPromptText(I18n.text("curriculum.course.code.prompt"));
         TextField courseNameField = new TextField(course == null || course.getName() == null ? "" : course.getName());
-        courseNameField.setPromptText("例: プログラミング基礎");
+        courseNameField.setPromptText(I18n.text("curriculum.course.name.prompt"));
         TextField creditsField = new TextField(course == null ? "" : String.valueOf(course.getCredits()));
-        creditsField.setPromptText("例: 2");
-        ComboBox<String> requirementTypeComboBox = new ComboBox<>(FXCollections.observableArrayList("必修", "選択"));
+        creditsField.setPromptText(I18n.text("curriculum.course.credits.prompt"));
+        ComboBox<String> requirementTypeComboBox = new ComboBox<>(FXCollections.observableArrayList(REQUIRED, ELECTIVE));
         requirementTypeComboBox.setValue(requirementType);
         TextArea memoArea = new TextArea(course == null || course.getDescription() == null ? "" : course.getDescription());
-        memoArea.setPromptText("補足事項（任意）");
+        memoArea.setPromptText(I18n.text("curriculum.course.memo.prompt"));
         memoArea.setPrefRowCount(4);
         memoArea.setWrapText(true);
         GridPane form = new GridPane();
@@ -718,16 +786,16 @@ public class CurriculumController extends AbstractAcademicContextController {
         creditsField.setMaxWidth(Double.MAX_VALUE);
         requirementTypeComboBox.setMaxWidth(Double.MAX_VALUE);
         memoArea.setMaxWidth(Double.MAX_VALUE);
-        form.addRow(0, new Label("授業コード"), courseCodeField);
-        form.addRow(1, new Label("授業名"), courseNameField);
-        form.addRow(2, new Label("単位数"), creditsField);
-        form.addRow(3, new Label("区分"), requirementTypeComboBox);
-        form.addRow(4, new Label("メモ"), memoArea);
+        form.addRow(0, new Label(I18n.text("curriculum.course.code")), courseCodeField);
+        form.addRow(1, new Label(I18n.text("curriculum.course.name")), courseNameField);
+        form.addRow(2, new Label(I18n.text("curriculum.course.credits")), creditsField);
+        form.addRow(3, new Label(I18n.text("common.requirementType")), requirementTypeComboBox);
+        form.addRow(4, new Label(I18n.text("curriculum.course.memo")), memoArea);
         dialog.getDialogPane().setContent(form);
         Node saveButton = dialog.getDialogPane().lookupButton(saveButtonType);
         saveButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
             if (courseCodeField.getText().isBlank() || courseNameField.getText().isBlank()) {
-                showError("授業コードと授業名を入力してください。");
+                showError(I18n.text("curriculum.error.courseFields"));
                 event.consume();
                 return;
             }
@@ -739,7 +807,7 @@ public class CurriculumController extends AbstractAcademicContextController {
                     throw new NumberFormatException();
                 }
             } catch (NumberFormatException e) {
-                showError("単位数は0以上の数値で入力してください。");
+                showError(I18n.text("curriculum.error.courseCredits"));
                 event.consume();
             }
         });
@@ -767,17 +835,20 @@ public class CurriculumController extends AbstractAcademicContextController {
         Course course = courseTable.getSelectionModel().getSelectedItem();
 
         if (course == null) {
-            showError("科目削除", new Exception("削除する科目を選択してください。"));
+            showError(
+                    I18n.text("curriculum.course.delete.title"),
+                    new Exception(I18n.text("curriculum.error.courseDeleteSelection"))
+            );
             return;
         }
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("科目削除");
-        alert.setHeaderText("科目を削除します。");
-        alert.setContentText("「" + course.getName() + "」を削除しますか？\n\n" + "この科目を削除すると、" + "この科目に関連付けられている" + "カリキュラムとの関連や" + "履修情報も削除されます。\n\n" + "この操作は元に戻せません。");
-        Optional<ButtonType> result = alert.showAndWait();
+        boolean confirmed = AppAlerts.confirm(
+                I18n.text("curriculum.course.delete.title"),
+                I18n.text("curriculum.course.delete.header"),
+                I18n.text("curriculum.course.delete.content", course.getName())
+        );
 
-        if (result.isEmpty() || result.get() != ButtonType.OK) {
+        if (!confirmed) {
             return;
         }
 
@@ -792,7 +863,10 @@ public class CurriculumController extends AbstractAcademicContextController {
                 descriptionArea.clear();
             }
         } catch (Exception e) {
-            showError("科目削除", new Exception("科目の削除に失敗しました。\n" + e.getMessage()));
+            showError(
+                    I18n.text("curriculum.course.delete.title"),
+                    new Exception(I18n.text("curriculum.error.courseDelete", e.getMessage()))
+            );
         }
     }
 
@@ -885,14 +959,19 @@ public class CurriculumController extends AbstractAcademicContextController {
         Major major = majorComboBox.getValue();
 
         if (major == null) {
-            showError("学科編集", new Exception("編集する学科を選択してください。"));
+            showError(
+                    I18n.text("curriculum.major.edit.title"),
+                    new Exception(I18n.text("curriculum.error.majorEditSelection"))
+            );
             return;
         }
 
-        TextInputDialog dialog = new TextInputDialog(major.getName());
-        dialog.setTitle("学科編集");
-        dialog.setHeaderText("学科名を変更します。");
-        dialog.setContentText("学科名:");
+        TextInputDialog dialog = AppDialogs.textInput(
+                major.getName(),
+                I18n.text("curriculum.major.edit.title"),
+                I18n.text("curriculum.major.edit.header"),
+                I18n.text("curriculum.major.name")
+        );
         Optional<String> result = dialog.showAndWait();
 
         if (result.isEmpty()) {
@@ -902,7 +981,10 @@ public class CurriculumController extends AbstractAcademicContextController {
         String name = result.get().trim();
 
         if (name.isBlank()) {
-            showError("学科編集", new Exception("学科名を入力してください。"));
+            showError(
+                    I18n.text("curriculum.major.edit.title"),
+                    new Exception(I18n.text("curriculum.error.majorName"))
+            );
             return;
         }
 
@@ -918,7 +1000,10 @@ public class CurriculumController extends AbstractAcademicContextController {
 
             selectMajorById(majorId);
         } catch (Exception e) {
-            showError("学科編集", new Exception("学科の更新に失敗しました。\n" + e.getMessage()));
+            showError(
+                    I18n.text("curriculum.major.edit.title"),
+                    new Exception(I18n.text("curriculum.error.majorUpdate", e.getMessage()))
+            );
         }
     }
 
@@ -927,17 +1012,20 @@ public class CurriculumController extends AbstractAcademicContextController {
         Major major = majorComboBox.getValue();
 
         if (major == null) {
-            showError("学科削除", new Exception("削除する学科を選択してください。"));
+            showError(
+                    I18n.text("curriculum.major.delete.title"),
+                    new Exception(I18n.text("curriculum.error.majorDeleteSelection"))
+            );
             return;
         }
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("学科削除");
-        alert.setHeaderText("学科を削除します。");
-        alert.setContentText("「" + major.getName() + "」を削除しますか？\n\n" + "この学科に所属するカリキュラム・" + "カテゴリ・カリキュラムと科目の関連も" + "削除されます。\n" + "科目そのものは残りますが、" + "カテゴリとの関連が外れる場合があります。\n\n" + "この操作は元に戻せません。");
-        Optional<ButtonType> result = alert.showAndWait();
+        boolean confirmed = AppAlerts.confirm(
+                I18n.text("curriculum.major.delete.title"),
+                I18n.text("curriculum.major.delete.header"),
+                I18n.text("curriculum.major.delete.content", major.getName())
+        );
 
-        if (result.isEmpty() || result.get() != ButtonType.OK) {
+        if (!confirmed) {
             return;
         }
 
@@ -949,7 +1037,10 @@ public class CurriculumController extends AbstractAcademicContextController {
                 loadMajors(department);
             }
         } catch (Exception e) {
-            showError("学科削除", new Exception("学科の削除に失敗しました。\n" + e.getMessage()));
+            showError(
+                    I18n.text("curriculum.major.delete.title"),
+                    new Exception(I18n.text("curriculum.error.majorDelete", e.getMessage()))
+            );
         }
     }
 

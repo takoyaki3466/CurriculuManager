@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.takoyaki.curriculummanager.controller.DatabaseTransferController"
+        spacing="18"
+        styleClass="page">
+
+    <padding>
+        <Insets top="18" right="18" bottom="18" left="18"/>
+    </padding>
+
+    <Label text="%databaseTransfer.title" styleClass="title-label"/>
+
+    <VBox spacing="8" styleClass="card">
+        <Label text="%databaseTransfer.export.title" styleClass="section-title"/>
+        <Label
+                text="%databaseTransfer.export.description"
+                wrapText="true"/>
+        <HBox>
+            <Button text="%databaseTransfer.export.button" onAction="#exportDatabase" styleClass="primary-button"/>
+        </HBox>
+    </VBox>
+
+    <Separator/>
+
+    <VBox spacing="8" styleClass="card">
+        <Label text="%databaseTransfer.import.title" styleClass="section-title"/>
+        <Label
+                text="%databaseTransfer.import.description"
+                wrapText="true"/>
+        <HBox>
+            <Button text="%databaseTransfer.import.button" onAction="#importDatabase"/>
+        </HBox>
+    </VBox>
+
+    <Label fx:id="statusLabel" text="%databaseTransfer.filePrompt" wrapText="true" styleClass="secondary-label"/>
+
+</VBox>

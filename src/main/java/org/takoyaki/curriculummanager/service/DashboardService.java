@@ -1,5 +1,6 @@
 package org.takoyaki.curriculummanager.service;
 
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Curriculum;
 import org.takoyaki.curriculummanager.model.Department;
 import org.takoyaki.curriculummanager.model.Enrollment;
@@ -14,6 +15,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
+
+import static org.takoyaki.curriculummanager.util.NumberFormatUtils.formatCredits;
 
 public class DashboardService {
     private final CurriculumService curriculumService;
@@ -53,25 +56,47 @@ public class DashboardService {
                     List<GraduationRequirement> requirements = graduationRequirementService.getRequirements(curriculum.getId());
                     List<MandatoryCourseStatus> mandatoryCourses = graduationRequirementService.getMandatoryCourseStatuses(curriculum.getId());
                     String requirementStatus = requirements.isEmpty()
-                            ? "未設定"
-                            : graduationRequirementService.areRequirementsSatisfied(curriculum.getId()) ? "達成" : "未達成";
+                            ? I18n.text("graduation.status.notConfigured")
+                            : graduationRequirementService.areRequirementsSatisfied(curriculum.getId())
+                            ? I18n.text("graduation.status.satisfied")
+                            : I18n.text("graduation.status.unsatisfied");
                     String mandatoryStatus = mandatoryCourses.isEmpty()
-                            ? "対象なし"
-                            : graduationRequirementService.isMandatoryCoursesSatisfied(curriculum.getId()) ? "達成" : "未達成";
-                    String curriculumStatus = graduationRequirementService.isGraduated(curriculum.getId()) ? "卒業可能" : "卒業不可";
-                    lines.add("    " + curriculumStatus + "  " + curriculum.getName()
-                            + "（単位要件: " + requirementStatus
-                            + " / 必修科目: " + mandatoryStatus + "）");
+                            ? I18n.text("graduation.status.notApplicable")
+                            : graduationRequirementService.isMandatoryCoursesSatisfied(curriculum.getId())
+                            ? I18n.text("graduation.status.satisfied")
+                            : I18n.text("graduation.status.unsatisfied");
+                    String curriculumStatus = graduationRequirementService.isGraduated(curriculum.getId())
+                            ? I18n.text("graduation.status.possible")
+                            : I18n.text("graduation.status.impossible");
+                    lines.add("    " + I18n.text(
+                            "dashboard.requirement.header",
+                            curriculumStatus,
+                            curriculum.getName(),
+                            requirementStatus,
+                            mandatoryStatus
+                    ));
 
                     for (GraduationRequirement requirement : requirements) {
                         boolean satisfied = graduationRequirementService.getRemainingCredits(requirement) <= 0;
-                        lines.add("      " + (satisfied ? "達成    " : "未達成  ")
-                                + requirement.getName() + " " + formatCredits(requirement.getRequiredCredits()) + "単位");
+                        lines.add("      " + I18n.text(
+                                "dashboard.requirement.line",
+                                satisfied
+                                        ? I18n.text("graduation.status.satisfied")
+                                        : I18n.text("graduation.status.unsatisfied"),
+                                requirement.getName(),
+                                formatCredits(requirement.getRequiredCredits())
+                        ));
                     }
 
                     for (MandatoryCourseStatus course : mandatoryCourses) {
-                        lines.add("      " + (course.isPassed() ? "達成    " : "未達成  ")
-                                + course.getCourseName() + " " + formatCredits(course.getCredits()) + "単位 必修");
+                        lines.add("      " + I18n.text(
+                                "dashboard.mandatory.line",
+                                course.isPassed()
+                                        ? I18n.text("graduation.status.satisfied")
+                                        : I18n.text("graduation.status.unsatisfied"),
+                                course.getCourseName(),
+                                formatCredits(course.getCredits())
+                        ));
                     }
                 }
             }
@@ -124,11 +149,4 @@ public class DashboardService {
         return false;
     }
 
-    private String formatCredits(double credits) {
-        if (credits == Math.floor(credits)) {
-            return String.valueOf((int) credits);
-        }
-
-        return String.valueOf(credits);
-    }
 }

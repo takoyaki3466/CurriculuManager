@@ -1,5 +1,6 @@
 package org.takoyaki.curriculummanager.service;
 
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.CourseCategory;
 import org.takoyaki.curriculummanager.model.Enrollment;
 import org.takoyaki.curriculummanager.model.GradeDef;
@@ -18,8 +19,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.takoyaki.curriculummanager.util.RequirementTypeUtils.isRequired;
+import static org.takoyaki.curriculummanager.util.ValidationUtils.validateCurriculumId;
+
 public class GraduationRequirementService {
-    private static final String REQUIREMENT_REQUIRED = "必修";
     private final EnrollmentRepository enrollmentRepository;
     private final CourseRepository courseRepository;
     private final CourseCategoryRepository categoryRepository;
@@ -117,11 +120,6 @@ public class GraduationRequirementService {
         return statuses;
     }
 
-    private boolean isRequired(String requirementType) {
-        return requirementType != null
-                && REQUIREMENT_REQUIRED.equals(requirementType.trim());
-    }
-
     private boolean isRequirementSatisfied(GraduationRequirement requirement) throws SQLException {
         double earnedCredits = getEarnedCredits(requirement);
         return earnedCredits >= requirement.getRequiredCredits();
@@ -129,7 +127,7 @@ public class GraduationRequirementService {
 
     public double getEarnedCredits(GraduationRequirement requirement) throws SQLException {
         if (requirement == null) {
-            throw new IllegalArgumentException("卒業要件が指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.graduationRequirement.required"));
         }
 
         validateCurriculumId(requirement.getCurriculumId());
@@ -248,7 +246,7 @@ public class GraduationRequirementService {
 
     private String getTargetCategoriesText(GraduationRequirement requirement) throws SQLException {
         if (requirement.isAllCategories()) {
-            return "すべて";
+            return I18n.text("graduation.category.all");
         }
 
         List<String> categoryNames = new ArrayList<>();
@@ -268,15 +266,10 @@ public class GraduationRequirementService {
         }
 
         if (categoryNames.isEmpty()) {
-            return "カテゴリなし";
+            return I18n.text("graduation.category.none");
         }
 
         return String.join(" / ", categoryNames);
     }
 
-    private void validateCurriculumId(Integer curriculumId) {
-        if (curriculumId == null) {
-            throw new IllegalArgumentException("カリキュラムIDが指定されていません。");
-        }
-    }
 }

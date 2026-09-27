@@ -30,31 +30,31 @@
             </padding>
 
             <FlowPane styleClass="responsive-flow" prefWrapLength="760">
-                <Label text="カリキュラム" styleClass="title-label"/>
-                <Button text="更新" onAction="#refresh" styleClass="secondary-button"/>
+                <Label text="%common.curriculum" styleClass="title-label"/>
+                <Button text="%common.refresh" onAction="#refresh" styleClass="secondary-button"/>
             </FlowPane>
 
             <VBox spacing="9" styleClass="toolbar-card">
-                <Label fx:id="academicContextLabel" text="学部・学科未設定" styleClass="context-label"/>
+                <Label fx:id="academicContextLabel" text="%common.notConfigured" styleClass="context-label"/>
 
                 <FlowPane styleClass="responsive-flow" prefWrapLength="760">
                     <HBox styleClass="field-group">
-                        <Label text="カリキュラム"/>
-                        <ComboBox fx:id="curriculumComboBox" styleClass="wide-combo" promptText="カリキュラムを選択"/>
+                        <Label text="%common.curriculum"/>
+                        <ComboBox fx:id="curriculumComboBox" styleClass="wide-combo" promptText="%common.curriculum.select"/>
                     </HBox>
 
-                    <Button text="カリキュラム追加" onAction="#addCurriculum" styleClass="primary-button"/>
-                    <Button text="カリキュラム編集" onAction="#editCurriculum" styleClass="secondary-button"/>
-                    <Button text="カリキュラム削除" onAction="#deleteCurriculum" styleClass="danger-button"/>
+                    <Button text="%common.curriculum.add" onAction="#addCurriculum" styleClass="primary-button"/>
+                    <Button text="%common.curriculum.edit" onAction="#editCurriculum" styleClass="secondary-button"/>
+                    <Button text="%common.curriculum.delete" onAction="#deleteCurriculum" styleClass="danger-button"/>
                 </FlowPane>
             </VBox>
 
             <VBox spacing="8" styleClass="card">
                 <FlowPane styleClass="responsive-flow" prefWrapLength="760">
-                    <Label text="科目カテゴリ" styleClass="section-title"/>
-                    <Button text="カテゴリ追加" onAction="#addCategory" styleClass="primary-button"/>
-                    <Button text="カテゴリ編集" onAction="#editCategory" styleClass="secondary-button"/>
-                    <Button text="カテゴリ削除" onAction="#deleteCategory" styleClass="danger-button"/>
+                    <Label text="%common.category" styleClass="section-title"/>
+                    <Button text="%common.category.add" onAction="#addCategory" styleClass="primary-button"/>
+                    <Button text="%common.category.edit" onAction="#editCategory" styleClass="secondary-button"/>
+                    <Button text="%common.category.delete" onAction="#deleteCategory" styleClass="danger-button"/>
                 </FlowPane>
 
                 <ListView fx:id="categoryList" prefHeight="145" minHeight="110"/>
@@ -62,24 +62,24 @@
 
             <VBox spacing="8" styleClass="card" VBox.vgrow="ALWAYS">
                 <FlowPane styleClass="responsive-flow" prefWrapLength="760">
-                    <Label text="科目" styleClass="section-title"/>
-                    <Button text="科目追加" onAction="#addCourse" styleClass="primary-button"/>
-                    <Button text="科目編集" onAction="#editCourse" styleClass="secondary-button"/>
-                    <Button text="科目削除" onAction="#deleteCourse" styleClass="danger-button"/>
+                    <Label text="%common.course" styleClass="section-title"/>
+                    <Button text="%common.course.add" onAction="#addCourse" styleClass="primary-button"/>
+                    <Button text="%common.course.edit" onAction="#editCourse" styleClass="secondary-button"/>
+                    <Button text="%common.course.delete" onAction="#deleteCourse" styleClass="danger-button"/>
                 </FlowPane>
 
                 <TableView fx:id="courseTable" prefHeight="260" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="courseCodeColumn" text="科目コード" minWidth="110" prefWidth="130"/>
-                        <TableColumn fx:id="courseNameColumn" text="科目名" minWidth="230" prefWidth="320"/>
-                        <TableColumn fx:id="creditsColumn" text="単位" minWidth="70" prefWidth="80"/>
-                        <TableColumn fx:id="requirementTypeColumn" text="区分" minWidth="90" prefWidth="110"/>
+                        <TableColumn fx:id="courseCodeColumn" text="%common.course.code" minWidth="110" prefWidth="130"/>
+                        <TableColumn fx:id="courseNameColumn" text="%common.course.name" minWidth="230" prefWidth="320"/>
+                        <TableColumn fx:id="creditsColumn" text="%common.credits" minWidth="70" prefWidth="80"/>
+                        <TableColumn fx:id="requirementTypeColumn" text="%common.requirementType" minWidth="90" prefWidth="110"/>
                     </columns>
                 </TableView>
             </VBox>
 
             <VBox spacing="8" styleClass="card">
-                <Label text="科目説明" styleClass="section-title"/>
+                <Label text="%common.course.description" styleClass="section-title"/>
                 <TextArea fx:id="descriptionArea"
                           editable="false"
                           wrapText="true"

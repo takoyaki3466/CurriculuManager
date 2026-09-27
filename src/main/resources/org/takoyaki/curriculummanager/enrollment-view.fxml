@@ -25,38 +25,38 @@
             </padding>
 
             <FlowPane styleClass="responsive-flow" prefWrapLength="760">
-                <Label text="履修科目" styleClass="title-label"/>
-                <Button text="更新" onAction="#refresh" styleClass="secondary-button"/>
+                <Label text="%nav.enrollment" styleClass="title-label"/>
+                <Button text="%common.refresh" onAction="#refresh" styleClass="secondary-button"/>
             </FlowPane>
 
             <VBox spacing="9" styleClass="toolbar-card">
-                <Label fx:id="academicContextLabel" text="学部・学科未設定" styleClass="context-label"/>
+                <Label fx:id="academicContextLabel" text="%common.notConfigured" styleClass="context-label"/>
 
                 <FlowPane styleClass="responsive-flow" prefWrapLength="760">
                     <HBox styleClass="field-group">
-                        <Label text="カリキュラム"/>
-                        <ComboBox fx:id="curriculumComboBox" styleClass="compact-combo" promptText="カリキュラムを選択"/>
+                        <Label text="%common.curriculum"/>
+                        <ComboBox fx:id="curriculumComboBox" styleClass="compact-combo" promptText="%common.curriculum.select"/>
                     </HBox>
                 </FlowPane>
 
                 <FlowPane styleClass="responsive-flow" prefWrapLength="760">
                     <HBox styleClass="field-group">
-                        <Label text="科目"/>
-                        <ComboBox fx:id="courseComboBox" styleClass="wide-combo" promptText="科目を選択"/>
+                        <Label text="%common.course"/>
+                        <ComboBox fx:id="courseComboBox" styleClass="wide-combo" promptText="%common.course.select"/>
                     </HBox>
 
                     <HBox styleClass="field-group">
-                        <Label text="年度"/>
+                        <Label text="%common.year"/>
                         <ComboBox fx:id="yearComboBox" styleClass="short-combo"/>
                     </HBox>
 
                     <HBox styleClass="field-group">
-                        <Label text="学期"/>
+                        <Label text="%common.semester"/>
                         <ComboBox fx:id="semesterComboBox" styleClass="short-combo"/>
                     </HBox>
 
-                    <Button text="履修登録" onAction="#addEnrollment" styleClass="primary-button"/>
-                    <Button text="削除" onAction="#deleteEnrollment" styleClass="danger-button"/>
+                    <Button text="%enrollment.register" onAction="#addEnrollment" styleClass="primary-button"/>
+                    <Button text="%common.delete" onAction="#deleteEnrollment" styleClass="danger-button"/>
                 </FlowPane>
             </VBox>
         </VBox>
@@ -70,12 +70,12 @@
 
             <TableView fx:id="enrollmentTable" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="yearColumn" text="年度" minWidth="75" prefWidth="80"/>
-                    <TableColumn fx:id="semesterColumn" text="学期" minWidth="80" prefWidth="90"/>
-                    <TableColumn fx:id="courseCodeColumn" text="科目コード" minWidth="110" prefWidth="125"/>
-                    <TableColumn fx:id="courseNameColumn" text="科目名" minWidth="220" prefWidth="300"/>
-                    <TableColumn fx:id="creditsColumn" text="単位" minWidth="70" prefWidth="80"/>
-                    <TableColumn fx:id="gradeColumn" text="成績" minWidth="70" prefWidth="80"/>
+                    <TableColumn fx:id="yearColumn" text="%common.year" minWidth="75" prefWidth="80"/>
+                    <TableColumn fx:id="semesterColumn" text="%common.semester" minWidth="80" prefWidth="90"/>
+                    <TableColumn fx:id="courseCodeColumn" text="%common.course.code" minWidth="110" prefWidth="125"/>
+                    <TableColumn fx:id="courseNameColumn" text="%common.course.name" minWidth="220" prefWidth="300"/>
+                    <TableColumn fx:id="creditsColumn" text="%common.credits" minWidth="70" prefWidth="80"/>
+                    <TableColumn fx:id="gradeColumn" text="%common.grade" minWidth="70" prefWidth="80"/>
                 </columns>
             </TableView>
         </VBox>

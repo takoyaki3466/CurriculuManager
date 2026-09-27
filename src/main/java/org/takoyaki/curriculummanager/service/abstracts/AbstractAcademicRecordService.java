@@ -15,25 +15,4 @@ public abstract class AbstractAcademicRecordService {
         gradeDefRepository = new GradeDefRepository();
     }
 
-    protected void validateCurriculumId(Integer curriculumId) {
-        if (curriculumId == null) {
-            throw new IllegalArgumentException("カリキュラムIDが指定されていません。");
-        }
-
-        if (curriculumId <= 0) {
-            throw new IllegalArgumentException("カリキュラムIDが不正です。");
-        }
-    }
-
-    protected void validateYear(int year) {
-        if (year <= 0) {
-            throw new IllegalArgumentException("年度が不正です。");
-        }
-    }
-
-    protected void validateSemester(String semester) {
-        if (semester == null || semester.isBlank()) {
-            throw new IllegalArgumentException("学期が指定されていません。");
-        }
-    }
 }

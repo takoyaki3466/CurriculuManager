@@ -25,6 +25,11 @@ tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
 
+tasks.processResources {
+    filteringCharset = "UTF-8"
+    exclude("**/*.properties")
+}
+
 application {
     mainModule.set(
         "org.takoyaki.curriculummanager"

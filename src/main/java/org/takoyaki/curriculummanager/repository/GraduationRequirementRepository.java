@@ -1,6 +1,7 @@
 package org.takoyaki.curriculummanager.repository;
 
 import org.takoyaki.curriculummanager.database.DatabaseManager;
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.GraduationRequirement;
 import org.takoyaki.curriculummanager.repository.abstracts.AbstractJdbcRepository;
 
@@ -11,9 +12,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
+
+import static org.takoyaki.curriculummanager.util.CollectionUtils.uniqueNonNull;
+import static org.takoyaki.curriculummanager.util.TransactionUtils.execute;
 
 public class GraduationRequirementRepository extends AbstractJdbcRepository<GraduationRequirement> {
     public GraduationRequirement save(GraduationRequirement requirement) throws SQLException {
@@ -27,7 +29,7 @@ public class GraduationRequirementRepository extends AbstractJdbcRepository<Grad
                 VALUES (?, ?, ?, ?)
                 """;
 
-        return executeInTransaction(connection -> {
+        return execute(connection -> {
             try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setInt(1, requirement.getCurriculumId());
                 setLegacyCategoryId(statement, 2, requirement);
@@ -39,7 +41,7 @@ public class GraduationRequirementRepository extends AbstractJdbcRepository<Grad
                     if (resultSet.next()) {
                         requirement.setId(resultSet.getInt(1));
                     } else {
-                        throw new SQLException("卒業要件のIDを取得できませんでした。");
+                        throw new SQLException(I18n.raw("repository.graduation.idMissing"));
                     }
                 }
             }
@@ -189,7 +191,7 @@ public class GraduationRequirementRepository extends AbstractJdbcRepository<Grad
 
     public void update(GraduationRequirement requirement) throws SQLException {
         if (requirement.getId() == null) {
-            throw new IllegalArgumentException("更新する卒業要件のIDが設定されていません。");
+            throw new IllegalArgumentException(I18n.raw("repository.graduation.updateIdRequired"));
         }
 
         String sql = """
@@ -202,7 +204,7 @@ public class GraduationRequirementRepository extends AbstractJdbcRepository<Grad
                 WHERE id = ?
                 """;
 
-        executeInTransaction(connection -> {
+        execute(connection -> {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, requirement.getCurriculumId());
                 setLegacyCategoryId(statement, 2, requirement);
@@ -212,7 +214,7 @@ public class GraduationRequirementRepository extends AbstractJdbcRepository<Grad
                 int updated = statement.executeUpdate();
 
                 if (updated == 0) {
-                    throw new SQLException("更新対象の卒業要件が存在しません。ID: " + requirement.getId());
+                    throw new SQLException(I18n.raw("repository.graduation.updateMissing", requirement.getId()));
                 }
             }
 
@@ -236,7 +238,7 @@ public class GraduationRequirementRepository extends AbstractJdbcRepository<Grad
     }
 
     private void insertCategoryRelations(Connection connection, GraduationRequirement requirement) throws SQLException {
-        List<Integer> categoryIds = normalizeCategoryIds(requirement.getCategoryIds());
+        List<Integer> categoryIds = uniqueNonNull(requirement.getCategoryIds());
 
         if (categoryIds.isEmpty()) {
             return;
@@ -297,7 +299,7 @@ public class GraduationRequirementRepository extends AbstractJdbcRepository<Grad
     }
 
     private void setLegacyCategoryId(PreparedStatement statement, int parameterIndex, GraduationRequirement requirement) throws SQLException {
-        List<Integer> categoryIds = normalizeCategoryIds(requirement.getCategoryIds());
+        List<Integer> categoryIds = uniqueNonNull(requirement.getCategoryIds());
 
         if (categoryIds.isEmpty()) {
             statement.setNull(parameterIndex, Types.INTEGER);
@@ -305,22 +307,6 @@ public class GraduationRequirementRepository extends AbstractJdbcRepository<Grad
         }
 
         statement.setInt(parameterIndex, categoryIds.get(0));
-    }
-
-    private List<Integer> normalizeCategoryIds(List<Integer> categoryIds) {
-        if (categoryIds == null || categoryIds.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        Set<Integer> uniqueIds = new LinkedHashSet<>();
-
-        for (Integer categoryId : categoryIds) {
-            if (categoryId != null) {
-                uniqueIds.add(categoryId);
-            }
-        }
-
-        return new ArrayList<>(uniqueIds);
     }
 
     private GraduationRequirement mapRow(Connection connection, ResultSet resultSet) throws SQLException {

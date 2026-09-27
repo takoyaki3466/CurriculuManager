@@ -1,5 +1,6 @@
 package org.takoyaki.curriculummanager.service;
 
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Enrollment;
 import org.takoyaki.curriculummanager.model.EnrollmentDisplay;
 import org.takoyaki.curriculummanager.model.GradeDef;
@@ -7,6 +8,10 @@ import org.takoyaki.curriculummanager.service.abstracts.AbstractAcademicRecordSe
 
 import java.sql.SQLException;
 import java.util.List;
+
+import static org.takoyaki.curriculummanager.util.ValidationUtils.validateCurriculumId;
+import static org.takoyaki.curriculummanager.util.ValidationUtils.validateSemester;
+import static org.takoyaki.curriculummanager.util.ValidationUtils.validateYear;
 
 public class GradeService extends AbstractAcademicRecordService {
     private final EnrollmentService enrollmentService;
@@ -58,28 +63,28 @@ public class GradeService extends AbstractAcademicRecordService {
 
     public void updateGrade(Integer enrollmentId, Integer gradeId) throws SQLException {
         if (enrollmentId == null) {
-            throw new IllegalArgumentException("履修IDが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.grade.enrollmentIdRequired"));
         }
 
         if (enrollmentId <= 0) {
-            throw new IllegalArgumentException("履修IDが不正です。");
+            throw new IllegalArgumentException(I18n.text("validation.grade.enrollmentIdInvalid"));
         }
 
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId);
 
         if (enrollment == null) {
-            throw new IllegalArgumentException("履修情報が存在しません: " + enrollmentId);
+            throw new IllegalArgumentException(I18n.text("validation.grade.enrollmentMissing", enrollmentId));
         }
 
         if (gradeId != null) {
             if (gradeId <= 0) {
-                throw new IllegalArgumentException("成績IDが不正です。");
+                throw new IllegalArgumentException(I18n.text("validation.grade.idInvalid"));
             }
 
             GradeDef grade = gradeDefRepository.findById(gradeId);
 
             if (grade == null) {
-                throw new IllegalArgumentException("指定された成績が存在しません: " + gradeId);
+                throw new IllegalArgumentException(I18n.text("validation.grade.missing", gradeId));
             }
         }
 
@@ -91,17 +96,17 @@ public class GradeService extends AbstractAcademicRecordService {
         validateCurriculumId(curriculumId);
 
         if (enrollmentId == null) {
-            throw new IllegalArgumentException("履修IDが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.grade.enrollmentIdRequired"));
         }
 
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId);
 
         if (enrollment == null) {
-            throw new IllegalArgumentException("履修情報が存在しません: " + enrollmentId);
+            throw new IllegalArgumentException(I18n.text("validation.grade.enrollmentMissing", enrollmentId));
         }
 
         if (!curriculumId.equals(enrollment.getCurriculumId())) {
-            throw new IllegalArgumentException("この履修は指定されたカリキュラムに属していません。");
+            throw new IllegalArgumentException(I18n.text("validation.grade.wrongCurriculum"));
         }
 
         updateGrade(enrollmentId, gradeId);

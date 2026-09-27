@@ -1,41 +1,26 @@
 package org.takoyaki.curriculummanager.controller.abstracts;
 
-import javafx.scene.control.Alert;
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Department;
 import org.takoyaki.curriculummanager.model.Major;
+import org.takoyaki.curriculummanager.view.dialog.AppAlerts;
 
 public abstract class AbstractController {
     protected void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("エラー");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        AppAlerts.error(message);
     }
 
     protected void showError(String message, Throwable exception) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("エラー");
-        alert.setHeaderText(message);
-
-        if (exception != null) {
-            alert.setContentText(exception.getMessage());
-        }
-
-        alert.showAndWait();
+        AppAlerts.error(message, exception);
     }
 
     protected void showInformation(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("完了");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        AppAlerts.information(message);
     }
 
     protected String formatAcademicContext(Department department, Major major) {
         if (department == null || major == null) {
-            return "学部・学科未設定";
+            return I18n.text("common.notConfigured");
         }
 
         return department.getName() + "　/　" + major.getName();

@@ -1,10 +1,15 @@
 package org.takoyaki.curriculummanager.service;
 
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.CourseCategory;
 import org.takoyaki.curriculummanager.repository.CourseCategoryRepository;
 import org.takoyaki.curriculummanager.service.abstracts.AbstractRepositoryService;
 
 import java.util.List;
+
+import static org.takoyaki.curriculummanager.util.ValidationUtils.requireEntity;
+import static org.takoyaki.curriculummanager.util.ValidationUtils.requireId;
+import static org.takoyaki.curriculummanager.util.ValidationUtils.requireText;
 
 public class CourseCategoryService extends AbstractRepositoryService<CourseCategory> {
     private final CourseCategoryRepository categoryRepository;
@@ -19,12 +24,12 @@ public class CourseCategoryService extends AbstractRepositoryService<CourseCateg
     }
 
     public List<CourseCategory> getCategories(Integer curriculumId) {
-        requireId(curriculumId, "カリキュラムが指定されていません。");
+        requireId(curriculumId, I18n.text("validation.curriculum.required"));
 
         try {
             return categoryRepository.findByCurriculumId(curriculumId);
         } catch (Exception e) {
-            throw new RuntimeException("カテゴリーの取得に失敗しました。", e);
+            throw new RuntimeException(I18n.text("service.category.load"), e);
         }
     }
 
@@ -32,53 +37,53 @@ public class CourseCategoryService extends AbstractRepositoryService<CourseCateg
         try {
             return categoryRepository.findAll();
         } catch (Exception e) {
-            throw new RuntimeException("カテゴリー一覧の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.text("service.category.list"), e);
         }
     }
 
     public void addCategory(CourseCategory category) {
-        requireEntity(category, "カテゴリーが指定されていません。");
+        requireEntity(category, I18n.text("validation.category.labelRequired"));
 
         if (category.getCurriculumId() == null) {
-            throw new IllegalArgumentException("カリキュラムが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.curriculum.required"));
         }
 
-        category.setName(requireText(category.getName(), "カテゴリー名を入力してください。"));
+        category.setName(requireText(category.getName(), I18n.text("validation.category.labelName")));
 
         try {
             categoryRepository.save(category);
         } catch (Exception e) {
-            throw new RuntimeException("カテゴリーの追加に失敗しました。", e);
+            throw new RuntimeException(I18n.text("service.category.add"), e);
         }
     }
 
     public void updateCategory(CourseCategory category) {
-        requireEntity(category, "更新するカテゴリーが指定されていません。");
+        requireEntity(category, I18n.text("validation.category.labelUpdateRequired"));
 
         if (category.getId() == null) {
-            throw new IllegalArgumentException("更新するカテゴリーが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.category.labelUpdateRequired"));
         }
 
         if (category.getCurriculumId() == null) {
-            throw new IllegalArgumentException("カリキュラムが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.curriculum.required"));
         }
 
-        category.setName(requireText(category.getName(), "カテゴリー名を入力してください。"));
+        category.setName(requireText(category.getName(), I18n.text("validation.category.labelName")));
 
         try {
             categoryRepository.update(category);
         } catch (Exception e) {
-            throw new RuntimeException("カテゴリーの更新に失敗しました。", e);
+            throw new RuntimeException(I18n.text("service.category.update"), e);
         }
     }
 
     public void deleteCategory(Integer id) {
-        requireId(id, "削除するカテゴリーが指定されていません。");
+        requireId(id, I18n.text("validation.category.labelDeleteRequired"));
 
         try {
             categoryRepository.deleteById(id);
         } catch (Exception e) {
-            throw new RuntimeException("カテゴリーの削除に失敗しました。", e);
+            throw new RuntimeException(I18n.text("service.category.delete"), e);
         }
     }
 }

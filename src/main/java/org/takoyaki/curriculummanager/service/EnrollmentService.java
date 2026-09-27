@@ -1,5 +1,6 @@
 package org.takoyaki.curriculummanager.service;
 
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Course;
 import org.takoyaki.curriculummanager.model.Enrollment;
 import org.takoyaki.curriculummanager.model.EnrollmentDisplay;
@@ -72,29 +73,29 @@ public class EnrollmentService {
 
     public void addEnrollment(Integer curriculumId, Integer courseId, int year, String semester) throws SQLException {
         if (curriculumId == null) {
-            throw new IllegalArgumentException("カリキュラムを指定してください。");
+            throw new IllegalArgumentException(I18n.text("validation.enrollment.curriculum"));
         }
 
         if (courseId == null) {
-            throw new IllegalArgumentException("科目を指定してください。");
+            throw new IllegalArgumentException(I18n.text("validation.enrollment.course"));
         }
 
         if (semester == null || semester.isBlank()) {
-            throw new IllegalArgumentException("学期を指定してください。");
+            throw new IllegalArgumentException(I18n.text("validation.enrollment.semester"));
         }
 
         if (year <= 0) {
-            throw new IllegalArgumentException("年度が正しくありません。");
+            throw new IllegalArgumentException(I18n.text("validation.enrollment.year"));
         }
 
         if (enrollmentRepository.exists(curriculumId, courseId, year, semester)) {
-            throw new IllegalArgumentException("同じ科目を同じ年度・学期に" + "重複して登録することはできません。");
+            throw new IllegalArgumentException(I18n.text("validation.enrollment.duplicate"));
         }
 
         Course course = courseRepository.findById(courseId);
 
         if (course == null) {
-            throw new IllegalArgumentException("指定された科目が存在しません: " + courseId);
+            throw new IllegalArgumentException(I18n.text("validation.enrollment.courseMissing", courseId));
         }
 
         Enrollment enrollment = new Enrollment(curriculumId, courseId, year, semester, null);
@@ -111,23 +112,23 @@ public class EnrollmentService {
 
     public void updateEnrollment(Enrollment enrollment) {
         if (enrollment == null) {
-            throw new IllegalArgumentException("履修情報がnullです。");
+            throw new IllegalArgumentException(I18n.text("validation.enrollment.null"));
         }
 
         if (enrollment.getId() == null) {
-            throw new IllegalArgumentException("履修情報IDが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.enrollment.idRequired"));
         }
 
         if (enrollment.getCurriculumId() == null) {
-            throw new IllegalArgumentException("カリキュラムを指定してください。");
+            throw new IllegalArgumentException(I18n.text("validation.enrollment.curriculum"));
         }
 
         if (enrollment.getCourseId() == null) {
-            throw new IllegalArgumentException("科目を指定してください。");
+            throw new IllegalArgumentException(I18n.text("validation.enrollment.course"));
         }
 
         if (enrollment.getSemester() == null || enrollment.getSemester().isBlank()) {
-            throw new IllegalArgumentException("学期を指定してください。");
+            throw new IllegalArgumentException(I18n.text("validation.enrollment.semester"));
         }
 
         enrollmentRepository.update(enrollment);
@@ -135,13 +136,13 @@ public class EnrollmentService {
 
     public void deleteEnrollment(Integer enrollmentId) {
         if (enrollmentId == null) {
-            throw new IllegalArgumentException("履修情報IDが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.enrollment.idRequired"));
         }
 
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId);
 
         if (enrollment == null) {
-            throw new IllegalArgumentException("指定された履修情報が存在しません: " + enrollmentId);
+            throw new IllegalArgumentException(I18n.text("validation.enrollment.missing", enrollmentId));
         }
 
         enrollmentRepository.deleteById(enrollmentId);

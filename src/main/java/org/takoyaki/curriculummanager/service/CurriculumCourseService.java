@@ -1,5 +1,6 @@
 package org.takoyaki.curriculummanager.service;
 
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Course;
 import org.takoyaki.curriculummanager.model.CurriculumCourse;
 import org.takoyaki.curriculummanager.model.CurriculumCourseDisplay;
@@ -8,6 +9,10 @@ import org.takoyaki.curriculummanager.repository.CurriculumCourseRepository;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.takoyaki.curriculummanager.util.ValidationUtils.requireText;
+import static org.takoyaki.curriculummanager.util.ValidationUtils.validateCourseId;
+import static org.takoyaki.curriculummanager.util.ValidationUtils.validateCurriculumId;
 
 public class CurriculumCourseService {
     private final CurriculumCourseRepository curriculumCourseRepository;
@@ -46,11 +51,11 @@ public class CurriculumCourseService {
         validateCurriculumId(curriculumId);
 
         if (categoryId == null) {
-            throw new IllegalArgumentException("カテゴリIDが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.category.idRequired"));
         }
 
         if (categoryId <= 0) {
-            throw new IllegalArgumentException("カテゴリIDが不正です。");
+            throw new IllegalArgumentException(I18n.text("validation.category.idInvalid"));
         }
 
         List<Course> courses = courseRepository.findByCategoryId(categoryId);
@@ -104,15 +109,15 @@ public class CurriculumCourseService {
     public void addCourseToCurriculum(Integer curriculumId, Integer courseId, String requirementType) throws SQLException {
         validateCurriculumId(curriculumId);
         validateCourseId(courseId);
-        validateRequirementType(requirementType);
+        requireText(requirementType, I18n.text("validation.requirementType.required"));
         Course course = courseRepository.findById(courseId);
 
         if (course == null) {
-            throw new IllegalArgumentException("科目が存在しません: " + courseId);
+            throw new IllegalArgumentException(I18n.text("validation.course.missing", courseId));
         }
 
         if (exists(curriculumId, courseId)) {
-            throw new IllegalArgumentException("この科目は既にカリキュラムへ登録されています。");
+            throw new IllegalArgumentException(I18n.text("validation.course.alreadyRegistered"));
         }
 
         CurriculumCourse curriculumCourse = new CurriculumCourse(curriculumId, courseId, requirementType);
@@ -121,16 +126,16 @@ public class CurriculumCourseService {
 
     public void update(CurriculumCourse curriculumCourse) throws SQLException {
         if (curriculumCourse == null) {
-            throw new IllegalArgumentException("カリキュラム科目情報がnullです。");
+            throw new IllegalArgumentException(I18n.text("validation.curriculumCourse.null"));
         }
 
         if (curriculumCourse.getId() == null) {
-            throw new IllegalArgumentException("更新対象のIDが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.update.idRequired"));
         }
 
         validateCurriculumId(curriculumCourse.getCurriculumId());
         validateCourseId(curriculumCourse.getCourseId());
-        validateRequirementType(curriculumCourse.getRequirementType());
+        requireText(curriculumCourse.getRequirementType(), I18n.text("validation.requirementType.required"));
         curriculumCourseRepository.update(curriculumCourse);
     }
 
@@ -139,7 +144,7 @@ public class CurriculumCourseService {
         validateCourseId(courseId);
 
         if (!exists(curriculumId, courseId)) {
-            throw new IllegalArgumentException("この科目はカリキュラムに登録されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.course.notRegistered"));
         }
 
         curriculumCourseRepository.deleteByCurriculumIdAndCourseId(curriculumId, courseId);
@@ -147,39 +152,14 @@ public class CurriculumCourseService {
 
     public void delete(Integer id) throws SQLException {
         if (id == null) {
-            throw new IllegalArgumentException("削除対象のIDが指定されていません。");
+            throw new IllegalArgumentException(I18n.text("validation.delete.idRequired"));
         }
 
         if (curriculumCourseRepository.findById(id) == null) {
-            throw new IllegalArgumentException("カリキュラム科目情報が存在しません: " + id);
+            throw new IllegalArgumentException(I18n.text("validation.curriculumCourse.missing", id));
         }
 
         curriculumCourseRepository.deleteById(id);
     }
 
-    private void validateRequirementType(String requirementType) {
-        if (requirementType == null || requirementType.isBlank()) {
-            throw new IllegalArgumentException("要件種別を入力してください。");
-        }
-    }
-
-    private void validateCurriculumId(Integer curriculumId) {
-        if (curriculumId == null) {
-            throw new IllegalArgumentException("カリキュラムIDが指定されていません。");
-        }
-
-        if (curriculumId <= 0) {
-            throw new IllegalArgumentException("カリキュラムIDが不正です。");
-        }
-    }
-
-    private void validateCourseId(Integer courseId) {
-        if (courseId == null) {
-            throw new IllegalArgumentException("科目IDが指定されていません。");
-        }
-
-        if (courseId <= 0) {
-            throw new IllegalArgumentException("科目IDが不正です。");
-        }
-    }
 }

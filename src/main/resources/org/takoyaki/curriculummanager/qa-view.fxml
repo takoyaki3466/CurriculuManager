@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        stylesheets="@style.css"
+        styleClass="content-scroll"
+        fitToWidth="true"
+        hbarPolicy="AS_NEEDED"
+        vbarPolicy="AS_NEEDED">
+
+    <content>
+        <VBox spacing="12" styleClass="page" minWidth="0">
+            <padding>
+                <Insets top="14" right="14" bottom="14" left="14"/>
+            </padding>
+
+            <Label text="%qa.title" styleClass="title-label"/>
+            <Label
+                    text="%qa.intro"
+                    wrapText="true"
+                    maxWidth="Infinity"
+                    styleClass="secondary-label"/>
+
+            <VBox spacing="10" styleClass="card">
+                <Label text="%qa.basics" styleClass="section-title"/>
+
+                <VBox spacing="5">
+                    <Label text="%qa.initial.question" styleClass="qa-question"/>
+                    <Label
+                            text="%qa.initial.answer"
+                            wrapText="true"
+                            maxWidth="Infinity"/>
+                </VBox>
+
+                <Separator/>
+
+                <VBox spacing="5">
+                    <Label text="%qa.curriculum.question" styleClass="qa-question"/>
+                    <Label
+                            text="%qa.curriculum.answer"
+                            wrapText="true"
+                            maxWidth="Infinity"/>
+                </VBox>
+
+                <Separator/>
+
+                <VBox spacing="5">
+                    <Label text="%qa.category.question" styleClass="qa-question"/>
+                    <Label
+                            text="%qa.category.answer"
+                            wrapText="true"
+                            maxWidth="Infinity"/>
+                </VBox>
+            </VBox>
+
+            <VBox spacing="10" styleClass="card">
+                <Label text="%qa.operations" styleClass="section-title"/>
+
+                <VBox spacing="5">
+                    <Label text="%qa.switch.question" styleClass="qa-question"/>
+                    <Label
+                            text="%qa.switch.answer"
+                            wrapText="true"
+                            maxWidth="Infinity"/>
+                </VBox>
+
+                <Separator/>
+
+                <VBox spacing="5">
+                    <Label text="%qa.registration.question" styleClass="qa-question"/>
+                    <Label
+                            text="%qa.registration.answer"
+                            wrapText="true"
+                            maxWidth="Infinity"/>
+                </VBox>
+
+                <Separator/>
+
+                <VBox spacing="5">
+                    <Label text="%qa.enrollment.question" styleClass="qa-question"/>
+                    <Label
+                            text="%qa.enrollment.answer"
+                            wrapText="true"
+                            maxWidth="Infinity"/>
+                </VBox>
+
+                <Separator/>
+
+                <VBox spacing="5">
+                    <Label text="%qa.grade.question" styleClass="qa-question"/>
+                    <Label
+                            text="%qa.grade.answer"
+                            wrapText="true"
+                            maxWidth="Infinity"/>
+                </VBox>
+
+                <Separator/>
+
+                <VBox spacing="5">
+                    <Label text="%qa.graduation.question" styleClass="qa-question"/>
+                    <Label
+                            text="%qa.graduation.answer"
+                            wrapText="true"
+                            maxWidth="Infinity"/>
+                </VBox>
+            </VBox>
+
+            <VBox spacing="10" styleClass="card">
+                <Label text="%qa.data" styleClass="section-title"/>
+
+                <VBox spacing="5">
+                    <Label text="%qa.backup.question" styleClass="qa-question"/>
+                    <Label
+                            text="%qa.backup.answer"
+                            wrapText="true"
+                            maxWidth="Infinity"/>
+                </VBox>
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

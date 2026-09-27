@@ -1,6 +1,7 @@
 package org.takoyaki.curriculummanager.repository;
 
 import org.takoyaki.curriculummanager.database.DatabaseManager;
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Curriculum;
 import org.takoyaki.curriculummanager.repository.abstracts.AbstractJdbcRepository;
 
@@ -35,7 +36,13 @@ public class CurriculumRepository extends AbstractJdbcRepository<Curriculum> {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("カリキュラムの登録に失敗しました。\n" + "学科ID: " + curriculum.getMajorId() + "\n" + "カリキュラム名: " + curriculum.getName() + "\n" + "開始年度: " + curriculum.getStartYear() + "\n" + "SQLiteエラー: " + e.getMessage(), e);
+            throw new RuntimeException(I18n.raw(
+                    "repository.curriculum.save",
+                    curriculum.getMajorId(),
+                    curriculum.getName(),
+                    curriculum.getStartYear(),
+                    e.getMessage()
+            ), e);
         }
 
         return curriculum;
@@ -62,7 +69,7 @@ public class CurriculumRepository extends AbstractJdbcRepository<Curriculum> {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("カリキュラムの取得に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.curriculum.load"), e);
         }
 
         return null;
@@ -87,7 +94,7 @@ public class CurriculumRepository extends AbstractJdbcRepository<Curriculum> {
                 curricula.add(mapRow(resultSet));
             }
         } catch (SQLException e) {
-            throw new RuntimeException("カリキュラム一覧の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.curriculum.list"), e);
         }
 
         return curricula;
@@ -116,7 +123,7 @@ public class CurriculumRepository extends AbstractJdbcRepository<Curriculum> {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("学科に所属するカリキュラムの取得に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.curriculum.listByMajor"), e);
         }
 
         return curricula;
@@ -140,7 +147,7 @@ public class CurriculumRepository extends AbstractJdbcRepository<Curriculum> {
             statement.setInt(4, curriculum.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("カリキュラムの更新に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.curriculum.update"), e);
         }
     }
 
@@ -155,7 +162,7 @@ public class CurriculumRepository extends AbstractJdbcRepository<Curriculum> {
             statement.setInt(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("カリキュラムの削除に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.curriculum.delete"), e);
         }
     }
 

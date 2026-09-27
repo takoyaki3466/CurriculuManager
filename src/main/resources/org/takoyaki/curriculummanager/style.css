@@ -67,6 +67,12 @@
     -fx-text-fill: #30343a;
 }
 
+.qa-question {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #30343a;
+}
+
 .context-label {
     -fx-font-size: 16px;
     -fx-font-weight: bold;

@@ -4,6 +4,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import org.takoyaki.curriculummanager.HelloApplication;
+import org.takoyaki.curriculummanager.i18n.I18n;
 import java.io.IOException;
 
 public class ViewManager {
@@ -16,11 +17,12 @@ public class ViewManager {
     public void show(String fxmlFile) {
         try {
             FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource(fxmlFile));
+            loader.setResources(I18n.bundle());
             Node view = loader.load();
             contentPane.getChildren().clear();
             contentPane.getChildren().add(view);
         } catch (IOException | NullPointerException e) {
-            throw new RuntimeException("画面を読み込めませんでした: " + fxmlFile, e);
+            throw new RuntimeException(I18n.text("view.error.load", fxmlFile), e);
         }
     }
 
@@ -42,5 +44,13 @@ public class ViewManager {
 
     public void showGraduation() {
         show("graduation-view.fxml");
+    }
+
+    public void showDatabaseTransfer() {
+        show("database-transfer-view.fxml");
+    }
+
+    public void showQa() {
+        show("qa-view.fxml");
     }
 }

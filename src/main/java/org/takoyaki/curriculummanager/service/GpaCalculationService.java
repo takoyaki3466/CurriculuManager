@@ -8,6 +8,10 @@ import org.takoyaki.curriculummanager.service.abstracts.AbstractAcademicRecordSe
 import java.sql.SQLException;
 import java.util.List;
 
+import static org.takoyaki.curriculummanager.util.ValidationUtils.validateCurriculumId;
+import static org.takoyaki.curriculummanager.util.ValidationUtils.validateSemester;
+import static org.takoyaki.curriculummanager.util.ValidationUtils.validateYear;
+
 public class GpaCalculationService extends AbstractAcademicRecordService {
 
     public double calculateGpa() throws SQLException {

@@ -1,5 +1,7 @@
 package org.takoyaki.curriculummanager.model;
 
+import org.takoyaki.curriculummanager.i18n.I18n;
+
 public class GraduationRequirementDisplay {
     private final Integer requirementId;
     private final String name;
@@ -52,6 +54,8 @@ public class GraduationRequirementDisplay {
     }
 
     public String getStatus() {
-        return isSatisfied() ? "達成" : "未達成";
+        return isSatisfied()
+                ? I18n.text("graduation.status.satisfied")
+                : I18n.text("graduation.status.unsatisfied");
     }
 }

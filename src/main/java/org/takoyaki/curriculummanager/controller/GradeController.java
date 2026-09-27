@@ -10,6 +10,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import org.takoyaki.curriculummanager.controller.abstracts.AbstractAcademicContextController;
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Curriculum;
 import org.takoyaki.curriculummanager.model.Department;
 import org.takoyaki.curriculummanager.model.EnrollmentDisplay;
@@ -100,6 +101,8 @@ public class GradeController extends AbstractAcademicContextController {
 
     private void setupCurriculumComboBox() {
         curriculumComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            saveCurrentCurriculum(newValue);
+
             try {
                 loadEnrollments(newValue);
             } catch (SQLException e) {
@@ -122,9 +125,7 @@ public class GradeController extends AbstractAcademicContextController {
         items.addAll(curricula);
         curriculumComboBox.setItems(items);
 
-        if (!items.isEmpty()) {
-            curriculumComboBox.getSelectionModel().selectFirst();
-        }
+        selectCurrentCurriculum(curriculumComboBox);
     }
 
     private void loadEnrollments(Curriculum curriculum) throws SQLException {
@@ -158,13 +159,13 @@ public class GradeController extends AbstractAcademicContextController {
         Curriculum curriculum = curriculumComboBox.getValue();
 
         if (curriculum == null || curriculum.getId() == null || curriculum.isAllOption()) {
-            showError("カリキュラムが選択されていません。");
+            showError(I18n.text("grade.error.curriculumRequired"));
             refresh();
             return;
         }
 
         if (newSymbol == null || newSymbol.isBlank()) {
-            showError("成績が選択されていません。");
+            showError(I18n.text("grade.error.gradeRequired"));
             refresh();
             return;
         }
@@ -172,7 +173,7 @@ public class GradeController extends AbstractAcademicContextController {
         GradeDef selectedGrade = gradeDefs.stream().filter(grade -> newSymbol.equals(grade.getSymbol())).findFirst().orElse(null);
 
         if (selectedGrade == null) {
-            showError("指定された成績が存在しません: " + newSymbol);
+            showError(I18n.text("grade.error.gradeMissing", newSymbol));
             refresh();
             return;
         }

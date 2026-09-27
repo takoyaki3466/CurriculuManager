@@ -24,22 +24,22 @@
                 <Insets top="14" right="14" bottom="10" left="14"/>
             </padding>
 
-            <Label text="カリキュラム科目設定" styleClass="title-label"/>
+            <Label text="%curriculum.courseSettings.title" styleClass="title-label"/>
 
             <FlowPane styleClass="toolbar-card,responsive-flow" prefWrapLength="760">
                 <HBox styleClass="field-group">
-                    <Label text="学部"/>
-                    <ComboBox fx:id="departmentComboBox" styleClass="compact-combo" promptText="学部を選択"/>
+                    <Label text="%common.department"/>
+                    <ComboBox fx:id="departmentComboBox" styleClass="compact-combo" promptText="%common.department.select"/>
                 </HBox>
 
                 <HBox styleClass="field-group">
-                    <Label text="カリキュラム"/>
-                    <ComboBox fx:id="curriculumComboBox" styleClass="wide-combo" promptText="カリキュラムを選択"/>
+                    <Label text="%common.curriculum"/>
+                    <ComboBox fx:id="curriculumComboBox" styleClass="wide-combo" promptText="%common.curriculum.select"/>
                 </HBox>
 
                 <HBox styleClass="field-group">
-                    <Label text="カテゴリ"/>
-                    <ComboBox fx:id="categoryComboBox" styleClass="compact-combo" promptText="カテゴリを選択"/>
+                    <Label text="%common.category.short"/>
+                    <ComboBox fx:id="categoryComboBox" styleClass="compact-combo" promptText="%common.category.select"/>
                 </HBox>
             </FlowPane>
         </VBox>
@@ -51,20 +51,20 @@
                 <Insets top="2" right="14" bottom="14" left="14"/>
             </BorderPane.margin>
 
-            <Label text="科目" styleClass="section-title"/>
+            <Label text="%common.course" styleClass="section-title"/>
 
             <TableView fx:id="courseTable" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="courseCodeColumn" text="科目コード" minWidth="115" prefWidth="140"/>
-                    <TableColumn fx:id="courseNameColumn" text="科目名" minWidth="240" prefWidth="360"/>
-                    <TableColumn fx:id="creditsColumn" text="単位" minWidth="70" prefWidth="80"/>
-                    <TableColumn fx:id="requirementTypeColumn" text="区分" minWidth="110" prefWidth="140"/>
+                    <TableColumn fx:id="courseCodeColumn" text="%common.course.code" minWidth="115" prefWidth="140"/>
+                    <TableColumn fx:id="courseNameColumn" text="%common.course.name" minWidth="240" prefWidth="360"/>
+                    <TableColumn fx:id="creditsColumn" text="%common.credits" minWidth="70" prefWidth="80"/>
+                    <TableColumn fx:id="requirementTypeColumn" text="%common.requirementType" minWidth="110" prefWidth="140"/>
                 </columns>
             </TableView>
 
             <FlowPane styleClass="responsive-flow" alignment="CENTER_RIGHT" prefWrapLength="760">
-                <Button text="カリキュラムに追加" onAction="#addCourse" styleClass="primary-button"/>
-                <Button text="カリキュラムから外す" onAction="#removeCourse" styleClass="danger-button"/>
+                <Button text="%curriculum.courseSettings.add" onAction="#addCourse" styleClass="primary-button"/>
+                <Button text="%curriculum.courseSettings.remove" onAction="#removeCourse" styleClass="danger-button"/>
             </FlowPane>
         </VBox>
     </center>

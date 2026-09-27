@@ -7,6 +7,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.takoyaki.curriculummanager.controller.abstracts.AbstractAcademicContextController;
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Course;
 import org.takoyaki.curriculummanager.model.Curriculum;
 import org.takoyaki.curriculummanager.model.Department;
@@ -80,7 +81,10 @@ public class EnrollmentController extends AbstractAcademicContextController {
     }
 
     private void setupSemesterComboBox() {
-        semesterComboBox.setItems(FXCollections.observableArrayList("前期", "後期"));
+        semesterComboBox.setItems(FXCollections.observableArrayList(
+                I18n.text("enrollment.semester.first"),
+                I18n.text("enrollment.semester.second")
+        ));
         semesterComboBox.getSelectionModel().selectFirst();
     }
 
@@ -93,6 +97,8 @@ public class EnrollmentController extends AbstractAcademicContextController {
 
     private void setupCurriculumComboBox() {
         curriculumComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            saveCurrentCurriculum(newValue);
+
             try {
                 loadCourses(newValue);
                 loadEnrollments(newValue);
@@ -121,7 +127,7 @@ public class EnrollmentController extends AbstractAcademicContextController {
         curriculumComboBox.setItems(items);
 
         if (!items.isEmpty()) {
-            curriculumComboBox.getSelectionModel().selectFirst();
+            selectCurrentCurriculum(curriculumComboBox);
         } else {
             courseComboBox.getItems().clear();
             enrollmentTable.getItems().clear();
@@ -174,35 +180,35 @@ public class EnrollmentController extends AbstractAcademicContextController {
         String semester = semesterComboBox.getValue();
 
         if (curriculum == null || curriculum.isAllOption()) {
-            showError("履修を登録するカリキュラムを選択してください。");
+            showError(I18n.text("enrollment.error.curriculumRequired"));
             return;
         }
 
         if (course == null) {
-            showError("科目を選択してください。");
+            showError(I18n.text("enrollment.error.courseRequired"));
             return;
         }
 
         if (year == null) {
-            showError("年度を選択してください。");
+            showError(I18n.text("enrollment.error.yearRequired"));
             return;
         }
 
         if (semester == null || semester.isBlank()) {
-            showError("学期を選択してください。");
+            showError(I18n.text("enrollment.error.semesterRequired"));
             return;
         }
 
         try {
             if (!curriculumCourseService.exists(curriculum.getId(), course.getId())) {
-                showError("選択した科目は、このカリキュラムに登録されていません。");
+                showError(I18n.text("enrollment.error.courseNotRegistered"));
                 return;
             }
 
             enrollmentService.addEnrollment(curriculum.getId(), course.getId(), year, semester);
             loadEnrollments(curriculum);
             courseComboBox.getSelectionModel().clearSelection();
-            showInformation("履修を登録しました。");
+            showInformation(I18n.text("enrollment.success.registered"));
         } catch (IllegalArgumentException | SQLException e) {
             showError(e.getMessage());
         }
@@ -213,7 +219,7 @@ public class EnrollmentController extends AbstractAcademicContextController {
         EnrollmentDisplay selected = enrollmentTable.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
-            showError("削除する履修を選択してください。");
+            showError(I18n.text("enrollment.error.deleteSelection"));
             return;
         }
 

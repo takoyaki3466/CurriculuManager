@@ -1,5 +1,7 @@
 package org.takoyaki.curriculummanager.database;
 
+import org.takoyaki.curriculummanager.i18n.I18n;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,7 +23,7 @@ public final class DatabaseManager {
         try {
             Files.createDirectories(DATA_DIRECTORY);
         } catch (Exception e) {
-            throw new SQLException("データベースディレクトリを作成できませんでした。", e);
+            throw new SQLException(I18n.raw("database.error.directory"), e);
         }
 
         Connection connection = DriverManager.getConnection(JDBC_URL);

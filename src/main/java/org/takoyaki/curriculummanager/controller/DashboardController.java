@@ -10,6 +10,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
 import org.takoyaki.curriculummanager.controller.abstracts.AbstractAcademicContextController;
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Department;
 import org.takoyaki.curriculummanager.model.Major;
 import org.takoyaki.curriculummanager.model.Enrollment;
@@ -18,6 +19,7 @@ import org.takoyaki.curriculummanager.service.CreditCalculationService;
 import org.takoyaki.curriculummanager.service.DashboardService;
 import org.takoyaki.curriculummanager.service.GpaCalculationService;
 import org.takoyaki.curriculummanager.service.CurriculumService;
+import org.takoyaki.curriculummanager.view.dialog.AppDialogs;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -72,7 +74,8 @@ public class DashboardController extends AbstractAcademicContextController {
                 super.updateItem(item, empty);
                 setText(empty ? null : item);
                 boolean incomplete = !empty && item != null
-                        && (item.stripLeading().startsWith("未達成") || item.stripLeading().startsWith("卒業不可"));
+                        && (item.stripLeading().startsWith(I18n.text("dashboard.status.unmet"))
+                        || item.stripLeading().startsWith(I18n.text("dashboard.graduationImpossible")));
                 setStyle(incomplete
                         ? "-fx-border-color: #d32f2f; -fx-border-width: 1.5; -fx-border-radius: 4; -fx-background-color: #ffebee;"
                         : "");
@@ -128,10 +131,12 @@ public class DashboardController extends AbstractAcademicContextController {
 
     @FXML
     private void addDepartment() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("学部追加");
-        dialog.setHeaderText("新しい学部を追加します。");
-        dialog.setContentText("学部名:");
+        TextInputDialog dialog = AppDialogs.textInput(
+                null,
+                I18n.text("dashboard.department.add.title"),
+                I18n.text("dashboard.department.add.header"),
+                I18n.text("dashboard.department.name")
+        );
         dialog.showAndWait().map(String::trim).filter(name -> !name.isBlank()).ifPresent(name -> {
             try {
                 Department department = new Department(name);
@@ -152,10 +157,12 @@ public class DashboardController extends AbstractAcademicContextController {
             return;
         }
 
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("学科追加");
-        dialog.setHeaderText("「" + department.getName() + "」へ学科を追加します。");
-        dialog.setContentText("学科名:");
+        TextInputDialog dialog = AppDialogs.textInput(
+                null,
+                I18n.text("dashboard.major.add.title"),
+                I18n.text("dashboard.major.add.header", department.getName()),
+                I18n.text("dashboard.major.name")
+        );
         dialog.showAndWait().map(String::trim).filter(name -> !name.isBlank()).ifPresent(name -> {
             Major major = new Major(department.getId(), name);
             curriculumService.addMajor(major);
@@ -167,7 +174,9 @@ public class DashboardController extends AbstractAcademicContextController {
     private void setupYearlySummaryTable() {
         yearColumn.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getYear()));
         yearlyGpaColumn.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(String.format("%.2f", data.getValue().getGpa())));
-        yearlyCreditsColumn.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(String.format("%.1f 単位", data.getValue().getEarnedCredits())));
+        yearlyCreditsColumn.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
+                I18n.text("dashboard.creditsFormat", String.format("%.1f", data.getValue().getEarnedCredits()))
+        ));
     }
 
     @FXML
@@ -177,8 +186,10 @@ public class DashboardController extends AbstractAcademicContextController {
         double gpa = gpaCalculationService.calculateGpa(currentEnrollments);
         double earnedCredits = creditCalculationService.calculateEarnedCredits(currentEnrollments);
         gpaLabel.setText(String.format("%.2f", gpa));
-        earnedCreditsLabel.setText(String.format("%.1f 単位", earnedCredits));
-        graduationPossibleLabel.setText(dashboardService.isGraduationPossible() ? "卒業可能" : "卒業不可");
+        earnedCreditsLabel.setText(I18n.text("dashboard.creditsFormat", String.format("%.1f", earnedCredits)));
+        graduationPossibleLabel.setText(dashboardService.isGraduationPossible()
+                ? I18n.text("dashboard.graduationPossible")
+                : I18n.text("dashboard.graduationImpossible"));
         List<YearlyAcademicSummary> yearlySummaries = new java.util.ArrayList<>();
 
         for (Integer year : dashboardService.getEnrollmentYears()) {

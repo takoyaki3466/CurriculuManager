@@ -16,6 +16,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.takoyaki.curriculummanager.controller.abstracts.AbstractAcademicContextController;
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.CourseCategory;
 import org.takoyaki.curriculummanager.model.Curriculum;
 import org.takoyaki.curriculummanager.model.Department;
@@ -25,6 +26,7 @@ import org.takoyaki.curriculummanager.model.MandatoryCourseStatus;
 import org.takoyaki.curriculummanager.repository.GraduationRequirementRepository;
 import org.takoyaki.curriculummanager.service.CurriculumService;
 import org.takoyaki.curriculummanager.service.GraduationRequirementService;
+import org.takoyaki.curriculummanager.view.dialog.AppDialogs;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -92,22 +94,32 @@ public class GraduationController extends AbstractAcademicContextController {
         requiredColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleDoubleProperty(cellData.getValue().getRequiredCredits()));
         earnedColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleDoubleProperty(cellData.getValue().getEarnedCredits()));
         remainingColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleDoubleProperty(cellData.getValue().getRemainingCredits()));
-        statusColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().isSatisfied() ? "達成" : "未達成"));
+        statusColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue().isSatisfied()
+                        ? I18n.text("graduation.status.satisfied")
+                        : I18n.text("graduation.status.unsatisfied")
+        ));
     }
 
     private void setupMandatoryCourseColumns() {
         mandatoryCourseCodeColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getCourseCode()));
         mandatoryCourseNameColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getCourseName()));
         mandatoryCreditsColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleDoubleProperty(cellData.getValue().getCredits()));
-        mandatoryStatusColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().isPassed() ? "修得済み" : "未修得"));
+        mandatoryStatusColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue().isPassed()
+                        ? I18n.text("graduation.status.passed")
+                        : I18n.text("graduation.status.notPassed")
+        ));
     }
 
     private void setupCurriculumComboBox() {
         curriculumComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            saveCurrentCurriculum(newValue);
+
             try {
                 refresh(newValue);
             } catch (SQLException e) {
-                showError("卒業要件の読み込みに失敗しました。\n" + e.getMessage());
+                showError(I18n.text("graduation.error.load", e.getMessage()));
             }
         });
     }
@@ -127,7 +139,7 @@ public class GraduationController extends AbstractAcademicContextController {
         items.add(Curriculum.allOption());
         items.addAll(curricula);
         curriculumComboBox.setItems(items);
-        curriculumComboBox.getSelectionModel().selectFirst();
+        selectCurrentCurriculum(curriculumComboBox);
     }
 
     private void refresh(Curriculum curriculum) throws SQLException {
@@ -152,15 +164,28 @@ public class GraduationController extends AbstractAcademicContextController {
             totalCredits += display.getEarnedCredits();
         }
 
-        totalCreditsLabel.setText(String.format("修得単位: %.1f", totalCredits));
+        totalCreditsLabel.setText(I18n.text("graduation.creditsFormat", String.format("%.1f", totalCredits)));
         List<MandatoryCourseStatus> mandatoryCourseStatuses = graduationRequirementService.getMandatoryCourseStatuses(curriculum.getId());
         mandatoryCourseTable.setItems(FXCollections.observableArrayList(mandatoryCourseStatuses));
         boolean mandatorySatisfied = graduationRequirementService.isMandatoryCoursesSatisfied(curriculum.getId());
         boolean requirementsSatisfied = graduationRequirementService.areRequirementsSatisfied(curriculum.getId());
-        String requirementStatus = displays.isEmpty() ? "未設定" : requirementsSatisfied ? "達成" : "未達成";
-        String mandatoryStatus = mandatoryCourseStatuses.isEmpty() ? "対象なし" : mandatorySatisfied ? "達成" : "未達成";
+        String requirementStatus = displays.isEmpty()
+                ? I18n.text("graduation.status.notConfigured")
+                : requirementsSatisfied
+                ? I18n.text("graduation.status.satisfied")
+                : I18n.text("graduation.status.unsatisfied");
+        String mandatoryStatus = mandatoryCourseStatuses.isEmpty()
+                ? I18n.text("graduation.status.notApplicable")
+                : mandatorySatisfied
+                ? I18n.text("graduation.status.satisfied")
+                : I18n.text("graduation.status.unsatisfied");
         boolean graduated = requirementsSatisfied && mandatorySatisfied;
-        graduationStatusLabel.setText((graduated ? "卒業可能" : "卒業不可") + "（単位要件: " + requirementStatus + " / 必修科目: " + mandatoryStatus + "）");
+        graduationStatusLabel.setText(I18n.text(
+                "graduation.status.detail",
+                graduated ? I18n.text("graduation.status.possible") : I18n.text("graduation.status.impossible"),
+                requirementStatus,
+                mandatoryStatus
+        ));
     }
 
     private void showAllCurricula() throws SQLException {
@@ -218,15 +243,25 @@ public class GraduationController extends AbstractAcademicContextController {
 
         requirementTable.setItems(FXCollections.observableArrayList(allRequirements));
         mandatoryCourseTable.setItems(FXCollections.observableArrayList(allMandatoryCourses));
-        totalCreditsLabel.setText(String.format("修得単位: %.1f", totalCredits));
-        graduationStatusLabel.setText(configuredCount == 0 ? "卒業要件が設定されていません" : "卒業可能: " + graduatedCount + " / " + configuredCount + "　単位要件達成: " + requirementsSatisfiedCount + " / " + requirementsConfiguredCount + "　必修達成: " + mandatorySatisfiedCount + " / " + mandatoryConfiguredCount);
+        totalCreditsLabel.setText(I18n.text("graduation.creditsFormat", String.format("%.1f", totalCredits)));
+        graduationStatusLabel.setText(configuredCount == 0
+                ? I18n.text("graduation.status.noRequirements")
+                : I18n.text(
+                        "graduation.status.summary",
+                        graduatedCount,
+                        configuredCount,
+                        requirementsSatisfiedCount,
+                        requirementsConfiguredCount,
+                        mandatorySatisfiedCount,
+                        mandatoryConfiguredCount
+                ));
     }
 
     private void clearView() {
         requirementTable.getItems().clear();
         mandatoryCourseTable.getItems().clear();
-        graduationStatusLabel.setText("カリキュラム未選択");
-        totalCreditsLabel.setText("修得単位: 0.0");
+        graduationStatusLabel.setText(I18n.text("graduation.curriculumNotSelected"));
+        totalCreditsLabel.setText(I18n.text("graduation.creditsValue"));
     }
 
     @FXML
@@ -239,7 +274,7 @@ public class GraduationController extends AbstractAcademicContextController {
         Curriculum curriculum = curriculumComboBox.getValue();
 
         if (curriculum == null || curriculum.isAllOption()) {
-            showError("卒業要件を追加するカリキュラムを選択してください。");
+            showError(I18n.text("graduation.error.curriculumRequired"));
             return;
         }
 
@@ -248,20 +283,21 @@ public class GraduationController extends AbstractAcademicContextController {
         try {
             categories = curriculumService.getCategories(curriculum.getId());
         } catch (SQLException e) {
-            showError("科目カテゴリの読み込みに失敗しました。\n" + e.getMessage());
+            showError(I18n.text("graduation.error.categoryLoad", e.getMessage()));
             return;
         }
 
-        Dialog<GraduationRequirement> dialog = new Dialog<>();
-        dialog.setTitle("卒業要件の追加");
-        dialog.setHeaderText("卒業要件の対象と必要単位数を設定してください。");
-        ButtonType saveButtonType = new ButtonType("追加", ButtonBar.ButtonData.OK_DONE);
+        Dialog<GraduationRequirement> dialog = AppDialogs.create(
+                I18n.text("graduation.dialog.add.title"),
+                I18n.text("graduation.dialog.add.header")
+        );
+        ButtonType saveButtonType = new ButtonType(I18n.text("dialog.button.add"), ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
         TextField nameField = new TextField();
-        nameField.setPromptText("例: 基礎科学分野");
+        nameField.setPromptText(I18n.text("graduation.dialog.name.prompt"));
         TextField creditsField = new TextField();
-        creditsField.setPromptText("例: 14");
-        CheckBox allCategoriesCheckBox = new CheckBox("すべてのカテゴリを対象にする");
+        creditsField.setPromptText(I18n.text("graduation.dialog.credits.prompt"));
+        CheckBox allCategoriesCheckBox = new CheckBox(I18n.text("graduation.dialog.allCategories"));
         allCategoriesCheckBox.setSelected(true);
         ListView<CourseCategory> categoryListView = new ListView<>();
         categoryListView.setItems(FXCollections.observableArrayList(categories));
@@ -275,7 +311,7 @@ public class GraduationController extends AbstractAcademicContextController {
                 categoryListView.getSelectionModel().clearSelection();
             }
         });
-        VBox box = new VBox(10, new Label("要件名"), nameField, new Label("必要単位"), creditsField, new Label("対象"), allCategoriesCheckBox, new Label("対象カテゴリ" + "（Ctrlキーを押しながらクリックすると複数選択できます）"), categoryListView);
+        VBox box = createRequirementForm(nameField, creditsField, allCategoriesCheckBox, categoryListView);
         box.setPrefWidth(450);
         dialog.getDialogPane().setContent(box);
         Node saveButtonNode = dialog.getDialogPane().lookupButton(saveButtonType);
@@ -283,7 +319,7 @@ public class GraduationController extends AbstractAcademicContextController {
             String name = nameField.getText().trim();
 
             if (name.isEmpty()) {
-                showError("要件名を入力してください。");
+                showError(I18n.text("graduation.error.nameRequired"));
                 event.consume();
                 return;
             }
@@ -293,19 +329,19 @@ public class GraduationController extends AbstractAcademicContextController {
             try {
                 credits = Double.parseDouble(creditsField.getText().trim());
             } catch (NumberFormatException e) {
-                showError("必要単位には数値を入力してください。");
+                showError(I18n.text("graduation.error.creditsNumber"));
                 event.consume();
                 return;
             }
 
             if (credits < 0) {
-                showError("必要単位は0以上で指定してください。");
+                showError(I18n.text("graduation.error.creditsNonNegative"));
                 event.consume();
                 return;
             }
 
             if (!allCategoriesCheckBox.isSelected() && categoryListView.getSelectionModel().getSelectedItems().isEmpty()) {
-                showError("対象カテゴリを1つ以上選択してください。\n" + "カリキュラム全体を対象にする場合は" + "「すべてのカテゴリを対象にする」" + "を選択してください。");
+                showError(I18n.text("graduation.error.categoryRequired"));
                 event.consume();
             }
         });
@@ -335,7 +371,7 @@ public class GraduationController extends AbstractAcademicContextController {
         GraduationRequirementDisplay selected = requirementTable.getSelectionModel().getSelectedItem();
 
         if (curriculum == null || curriculum.isAllOption() || selected == null || selected.getRequirementId() == null) {
-            showError("編集する卒業要件を選択してください。");
+            showError(I18n.text("graduation.error.editSelection"));
             return;
         }
 
@@ -344,19 +380,20 @@ public class GraduationController extends AbstractAcademicContextController {
             GraduationRequirement requirement = repository.findById(selected.getRequirementId());
 
             if (requirement == null) {
-                showError("選択した卒業要件が見つかりません。");
+                showError(I18n.text("graduation.error.notFound"));
                 return;
             }
 
             List<CourseCategory> categories = curriculumService.getCategories(curriculum.getId());
-            Dialog<GraduationRequirement> dialog = new Dialog<>();
-            dialog.setTitle("卒業要件の編集");
-            dialog.setHeaderText("卒業要件の内容を変更してください。");
-            ButtonType saveButtonType = new ButtonType("保存", ButtonBar.ButtonData.OK_DONE);
+            Dialog<GraduationRequirement> dialog = AppDialogs.create(
+                    I18n.text("graduation.dialog.edit.title"),
+                    I18n.text("graduation.dialog.edit.header")
+            );
+            ButtonType saveButtonType = new ButtonType(I18n.text("dialog.button.save"), ButtonBar.ButtonData.OK_DONE);
             dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
             TextField nameField = new TextField(requirement.getName());
             TextField creditsField = new TextField(String.valueOf(requirement.getRequiredCredits()));
-            CheckBox allCategoriesCheckBox = new CheckBox("すべてのカテゴリを対象にする");
+            CheckBox allCategoriesCheckBox = new CheckBox(I18n.text("graduation.dialog.allCategories"));
             allCategoriesCheckBox.setSelected(requirement.isAllCategories());
             ListView<CourseCategory> categoryListView = new ListView<>(FXCollections.observableArrayList(categories));
             categoryListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -378,13 +415,13 @@ public class GraduationController extends AbstractAcademicContextController {
                     categoryListView.getSelectionModel().clearSelection();
                 }
             });
-            VBox box = new VBox(10, new Label("要件名"), nameField, new Label("必要単位"), creditsField, new Label("対象"), allCategoriesCheckBox, new Label("対象カテゴリ（Ctrlキーを押しながらクリックすると複数選択できます）"), categoryListView);
+            VBox box = createRequirementForm(nameField, creditsField, allCategoriesCheckBox, categoryListView);
             box.setPrefWidth(450);
             dialog.getDialogPane().setContent(box);
             Node saveButtonNode = dialog.getDialogPane().lookupButton(saveButtonType);
             saveButtonNode.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
                 if (nameField.getText().isBlank()) {
-                    showError("要件名を入力してください。");
+                    showError(I18n.text("graduation.error.nameRequired"));
                     event.consume();
                     return;
                 }
@@ -396,13 +433,13 @@ public class GraduationController extends AbstractAcademicContextController {
                         throw new NumberFormatException();
                     }
                 } catch (NumberFormatException e) {
-                    showError("必要単位は0以上の数値で入力してください。");
+                    showError(I18n.text("graduation.error.creditsValid"));
                     event.consume();
                     return;
                 }
 
                 if (!allCategoriesCheckBox.isSelected() && categoryListView.getSelectionModel().getSelectedItems().isEmpty()) {
-                    showError("対象カテゴリを1つ以上選択してください。");
+                    showError(I18n.text("graduation.error.categoryRequiredShort"));
                     event.consume();
                 }
             });
@@ -426,11 +463,11 @@ public class GraduationController extends AbstractAcademicContextController {
                     repository.update(updated);
                     refresh(curriculum);
                 } catch (SQLException e) {
-                    showError("卒業要件の更新に失敗しました。\n" + e.getMessage());
+                    showError(I18n.text("graduation.error.update", e.getMessage()));
                 }
             });
         } catch (SQLException e) {
-            showError("卒業要件の読み込みに失敗しました。\n" + e.getMessage());
+            showError(I18n.text("graduation.error.load", e.getMessage()));
         }
     }
 
@@ -440,8 +477,26 @@ public class GraduationController extends AbstractAcademicContextController {
             repository.save(requirement);
             refresh(curriculumComboBox.getValue());
         } catch (SQLException e) {
-            showError("卒業要件の保存に失敗しました。\n" + e.getMessage());
+            showError(I18n.text("graduation.error.save", e.getMessage()));
         }
     }
 
+    private VBox createRequirementForm(
+            TextField nameField,
+            TextField creditsField,
+            CheckBox allCategoriesCheckBox,
+            ListView<CourseCategory> categoryListView
+    ) {
+        return new VBox(
+                10,
+                new Label(I18n.text("graduation.dialog.name")),
+                nameField,
+                new Label(I18n.text("graduation.dialog.credits")),
+                creditsField,
+                new Label(I18n.text("graduation.dialog.target")),
+                allCategoriesCheckBox,
+                new Label(I18n.text("graduation.dialog.targetCategories")),
+                categoryListView
+        );
+    }
 }

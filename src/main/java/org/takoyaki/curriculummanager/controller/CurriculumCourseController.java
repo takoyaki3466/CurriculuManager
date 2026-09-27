@@ -7,6 +7,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import org.takoyaki.curriculummanager.controller.abstracts.AbstractController;
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.CourseCategory;
 import org.takoyaki.curriculummanager.model.Curriculum;
 import org.takoyaki.curriculummanager.model.Department;
@@ -17,9 +18,10 @@ import org.takoyaki.curriculummanager.service.CurriculumService;
 import java.sql.SQLException;
 import java.util.List;
 
+import static org.takoyaki.curriculummanager.util.RequirementTypeUtils.ELECTIVE;
+import static org.takoyaki.curriculummanager.util.RequirementTypeUtils.REQUIRED;
+
 public class CurriculumCourseController extends AbstractController {
-    private static final String REQUIREMENT_REQUIRED = "必修";
-    private static final String REQUIREMENT_ELECTIVE = "選択";
     @FXML
     private ComboBox<Department> departmentComboBox;
     @FXML
@@ -63,7 +65,7 @@ public class CurriculumCourseController extends AbstractController {
 
     private void setupRequirementTypeColumn() {
         courseTable.setEditable(true);
-        requirementTypeColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(REQUIREMENT_REQUIRED, REQUIREMENT_ELECTIVE)));
+        requirementTypeColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(REQUIRED, ELECTIVE)));
         requirementTypeColumn.setOnEditCommit(event -> {
             CurriculumCourseDisplay display = event.getRowValue();
             String newRequirementType = event.getNewValue();
@@ -77,7 +79,7 @@ public class CurriculumCourseController extends AbstractController {
             }
 
             if (display.getId() == null) {
-                showError("この科目はまだカリキュラムに登録されていません。\n" + "先に「カリキュラムに追加」を実行してください。");
+                showError(I18n.text("curriculumCourse.error.notRegistered"));
                 reloadCurrentCategorySafely();
                 return;
             }
@@ -92,7 +94,7 @@ public class CurriculumCourseController extends AbstractController {
             } catch (Exception e) {
                 display.setRequirementType(oldRequirementType);
                 courseTable.refresh();
-                showError("科目区分の変更に失敗しました。\n" + e.getMessage());
+                showError(I18n.text("curriculumCourse.error.typeUpdate", e.getMessage()));
             }
         });
     }
@@ -102,7 +104,7 @@ public class CurriculumCourseController extends AbstractController {
             try {
                 loadCurricula(newValue);
             } catch (SQLException e) {
-                showError("カリキュラムの取得に失敗しました。\n" + e.getMessage());
+                showError(I18n.text("curriculumCourse.error.curriculumLoad", e.getMessage()));
             }
         });
     }
@@ -112,7 +114,7 @@ public class CurriculumCourseController extends AbstractController {
             try {
                 loadCategories(newValue);
             } catch (SQLException e) {
-                showError("カテゴリの取得に失敗しました。\n" + e.getMessage());
+                showError(I18n.text("curriculumCourse.error.categoryLoad", e.getMessage()));
             }
         });
     }
@@ -122,7 +124,7 @@ public class CurriculumCourseController extends AbstractController {
             try {
                 loadCourses(newValue);
             } catch (SQLException e) {
-                showError("科目の取得に失敗しました。\n" + e.getMessage());
+                showError(I18n.text("curriculumCourse.error.courseLoad", e.getMessage()));
             }
         });
     }
@@ -194,27 +196,27 @@ public class CurriculumCourseController extends AbstractController {
         Curriculum curriculum = curriculumComboBox.getValue();
 
         if (curriculum == null || curriculum.getId() == null) {
-            showError("カリキュラムを選択してください。");
+            showError(I18n.text("curriculumCourse.error.curriculumRequired"));
             return;
         }
 
         CurriculumCourseDisplay selectedCourse = courseTable.getSelectionModel().getSelectedItem();
 
         if (selectedCourse == null) {
-            showError("科目を選択してください。");
+            showError(I18n.text("curriculumCourse.error.courseRequired"));
             return;
         }
 
         if (selectedCourse.getId() != null) {
-            showError("この科目はすでにカリキュラムへ登録されています。");
+            showError(I18n.text("curriculumCourse.error.alreadyRegistered"));
             return;
         }
 
         try {
-            curriculumCourseService.addCourseToCurriculum(curriculum.getId(), selectedCourse.getCourseId(), REQUIREMENT_ELECTIVE);
+            curriculumCourseService.addCourseToCurriculum(curriculum.getId(), selectedCourse.getCourseId(), ELECTIVE);
             reloadCurrentCategory();
         } catch (Exception e) {
-            showError("科目の追加に失敗しました。\n" + e.getMessage());
+            showError(I18n.text("curriculumCourse.error.add", e.getMessage()));
         }
     }
 
@@ -223,19 +225,19 @@ public class CurriculumCourseController extends AbstractController {
         Curriculum curriculum = curriculumComboBox.getValue();
 
         if (curriculum == null || curriculum.getId() == null) {
-            showError("カリキュラムを選択してください。");
+            showError(I18n.text("curriculumCourse.error.curriculumRequired"));
             return;
         }
 
         CurriculumCourseDisplay selectedCourse = courseTable.getSelectionModel().getSelectedItem();
 
         if (selectedCourse == null) {
-            showError("科目を選択してください。");
+            showError(I18n.text("curriculumCourse.error.courseRequired"));
             return;
         }
 
         if (selectedCourse.getId() == null) {
-            showError("この科目はカリキュラムに登録されていません。");
+            showError(I18n.text("curriculumCourse.error.notInCurriculum"));
             return;
         }
 
@@ -243,7 +245,7 @@ public class CurriculumCourseController extends AbstractController {
             curriculumCourseService.removeCourseFromCurriculum(curriculum.getId(), selectedCourse.getCourseId());
             reloadCurrentCategory();
         } catch (Exception e) {
-            showError("科目の削除に失敗しました。\n" + e.getMessage());
+            showError(I18n.text("curriculumCourse.error.remove", e.getMessage()));
         }
     }
 
@@ -255,7 +257,7 @@ public class CurriculumCourseController extends AbstractController {
         try {
             reloadCurrentCategory();
         } catch (SQLException e) {
-            showError("科目一覧の再読み込みに失敗しました。\n" + e.getMessage());
+            showError(I18n.text("curriculumCourse.error.reload", e.getMessage()));
         }
     }
 

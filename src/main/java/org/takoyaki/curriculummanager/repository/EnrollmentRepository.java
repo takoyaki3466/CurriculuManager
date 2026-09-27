@@ -1,6 +1,7 @@
 package org.takoyaki.curriculummanager.repository;
 
 import org.takoyaki.curriculummanager.database.DatabaseManager;
+import org.takoyaki.curriculummanager.i18n.I18n;
 import org.takoyaki.curriculummanager.model.Enrollment;
 import org.takoyaki.curriculummanager.repository.abstracts.AbstractJdbcRepository;
 
@@ -52,7 +53,7 @@ public class EnrollmentRepository extends AbstractJdbcRepository<Enrollment> {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("履修情報の保存に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.enrollment.save"), e);
         }
 
         return enrollment;
@@ -81,7 +82,7 @@ public class EnrollmentRepository extends AbstractJdbcRepository<Enrollment> {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("履修情報の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.enrollment.load"), e);
         }
 
         return null;
@@ -111,7 +112,7 @@ public class EnrollmentRepository extends AbstractJdbcRepository<Enrollment> {
                 enrollments.add(mapRow(result));
             }
         } catch (SQLException e) {
-            throw new RuntimeException("履修情報一覧の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.enrollment.list"), e);
         }
 
         return enrollments;
@@ -145,7 +146,7 @@ public class EnrollmentRepository extends AbstractJdbcRepository<Enrollment> {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("カリキュラム別履修情報の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.enrollment.listByCurriculum"), e);
         }
 
         return enrollments;
@@ -180,7 +181,7 @@ public class EnrollmentRepository extends AbstractJdbcRepository<Enrollment> {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("年度別履修情報の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.enrollment.listByYear"), e);
         }
 
         return enrollments;
@@ -215,7 +216,7 @@ public class EnrollmentRepository extends AbstractJdbcRepository<Enrollment> {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("学期別履修情報の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.enrollment.listBySemester"), e);
         }
 
         return enrollments;
@@ -249,7 +250,7 @@ public class EnrollmentRepository extends AbstractJdbcRepository<Enrollment> {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("科目別履修情報の取得に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.enrollment.listByCourse"), e);
         }
 
         return enrollments;
@@ -288,7 +289,7 @@ public class EnrollmentRepository extends AbstractJdbcRepository<Enrollment> {
             statement.setInt(6, enrollment.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("履修情報の更新に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.enrollment.update"), e);
         }
     }
 
@@ -303,7 +304,7 @@ public class EnrollmentRepository extends AbstractJdbcRepository<Enrollment> {
             statement.setInt(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("履修情報の削除に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.enrollment.delete"), e);
         }
     }
 
@@ -329,7 +330,7 @@ public class EnrollmentRepository extends AbstractJdbcRepository<Enrollment> {
                 return result.next();
             }
         } catch (SQLException e) {
-            throw new RuntimeException("履修情報の重複確認に失敗しました。", e);
+            throw new RuntimeException(I18n.raw("repository.enrollment.duplicate"), e);
         }
     }
 
